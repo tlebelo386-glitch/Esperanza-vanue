@@ -77,7 +77,6 @@ export function Onboarding() {
           </p>
           <h2
             className="text-3xl font-semibold leading-tight tracking-tight text-foreground text-balance sm:text-4xl lg:text-5xl"
-            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
           >
             Find your perfect package
           </h2>
@@ -106,7 +105,6 @@ export function Onboarding() {
                 </p>
                 <h3
                   className="mt-2 text-2xl font-semibold text-foreground"
-                  style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
                 >
                   {step === 0 && "What are you planning?"}
                   {step === 1 && "How many guests?"}
@@ -203,14 +201,12 @@ export function Onboarding() {
                 </span>
                 <h3
                   className="text-2xl font-semibold text-foreground"
-                  style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
                 >
                   Your recommended package
                 </h3>
                 <div className="mx-auto mt-4 max-w-md rounded-2xl border-2 border-amber-400/40 bg-amber-50/50 p-6 shadow-gold-glow">
                   <p
-                    className="text-3xl font-bold text-amber-700"
-                    style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+                    className="font-serif text-3xl font-semibold text-accent-foreground"
                   >
                     {recommendation.package}
                   </p>

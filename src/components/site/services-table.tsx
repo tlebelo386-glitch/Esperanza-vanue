@@ -87,7 +87,6 @@ export function ServicesTable() {
           </p>
           <h2
             className="text-3xl font-semibold leading-tight tracking-tight text-foreground text-balance sm:text-4xl lg:text-5xl"
-            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
           >
             Compare every service, side by side
           </h2>
