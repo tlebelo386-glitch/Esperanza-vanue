@@ -308,6 +308,14 @@ export const GALLERY_IMAGES = [
   { src: "/images/barn-twilight.png", alt: "Barn venue exterior at twilight with fairy lights", tag: "Barn exterior", category: "Reception" },
   { src: "/images/horses.png", alt: "Brown horses in green paddock on the equestrian farm", tag: "Horses", category: "Animals" },
   { src: "/images/donkey-drinks.png", alt: "Donkey carrying tray of welcome drinks during cocktail hour", tag: "Donkey drinks", category: "Animals" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7-Au9U7XeIrUXkQxmfdijKW8qKBIEdgZ.jpg", alt: "Children enjoy a hands-on craft activity in the farm barn", tag: "Little guests at play", category: "Details" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LMP%20Kemp%20Troue-845-n47TltDQyyOmOfHgV3ySYAQBqGN7Kd.jpg", alt: "Wedding guests ride in a donkey cart through a green farm meadow", tag: "A farm-style arrival", category: "Ceremony" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/52569261_2170397656336756_8750698658158084096_n-HpPDmXXmKgseJFRcFh9tIrGA8QEbMm.jpg", alt: "Farm barn set for a celebration with straw-bale seating and party favors", tag: "Thoughtful little details", category: "Reception" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8cbca9_3f73f9bdde4e429c99cda496c2c58068~mv2-cNX0G0gOLUokM57OCEHDOXWJABibwx.jpg", alt: "Close portrait of a saddled farm donkey", tag: "Meet the residents", category: "Animals" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/FB_IMG_1790835085842-9dgoyIgBqXu0RnRaKPuSpKgmjyGbkc.jpg", alt: "Two geese lead the way as a couple stands in the farmyard", tag: "Unexpected guests", category: "Animals" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/FB_IMG_1790835047965-G2dlVwoVCUfvWQT7u0QukvCjpNDiIY.jpg", alt: "Newlyweds walk through a joyful outdoor wedding celebration", tag: "The happiest send-off", category: "Ceremony" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/FB_IMG_1790835064984-TNLDLthi5MJYRRTyv2l3zyEDTI0rv9.jpg", alt: "Rustic wooden welcome sign framed by greenery at the farm entrance", tag: "Welcome to the farm", category: "Details" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/FB_IMG_1790835015425-CUhhyAFqatBoSUQHn84MRVWgyDDfA9.jpg", alt: "Newlyweds pose beside a flower-adorned donkey at the venue", tag: "A wedding-day favorite", category: "Animals" },
   { src: "/images/cabin-interior.png", alt: "Rustic cabin accommodation interior with white linen and fairy lights", tag: "Dressing room", category: "Rooms" },
 ];
 

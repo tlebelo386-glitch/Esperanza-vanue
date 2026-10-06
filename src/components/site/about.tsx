@@ -49,8 +49,8 @@ export function About() {
             {/* Main: floral-arch couple (premium boho-luxe) */}
             <div className="absolute left-0 top-0 h-3/4 w-3/4 overflow-hidden rounded-2xl shadow-xl ring-1 ring-border">
               <Image
-                src="/images/collage-floral-arch.jpg"
-                alt="Couple under floral arch of pampas grass and white blooms — bohemian-luxe wedding"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/FB_IMG_1790835064984-TNLDLthi5MJYRRTyv2l3zyEDTI0rv9.jpg"
+                alt="Rustic wooden welcome sign framed by greenery at the farm entrance"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 75vw, 30vw"
@@ -60,15 +60,15 @@ export function About() {
             {/* Inset: horses (working-farm character) */}
             <div className="absolute bottom-0 right-0 h-3/5 w-3/5 overflow-hidden rounded-2xl border-4 border-background shadow-xl ring-1 ring-border">
               <Image
-                src="/images/horses.png"
-                alt="Brown horses in a green paddock on the equestrian farm"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/FB_IMG_1790835015425-CUhhyAFqatBoSUQHn84MRVWgyDDfA9.jpg"
+                alt="Newlyweds pose beside a flower-adorned donkey at the venue"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 60vw, 24vw"
               />
             </div>
             <div className="absolute bottom-4 left-4 rounded-full bg-primary px-4 py-2 text-xs font-medium uppercase tracking-wider text-primary-foreground shadow-lg">
-              Real horses. Real farm.
+              One-of-a-kind farm moments
             </div>
           </div>
 

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Music, Mic, Disc3, Sparkles, Gamepad2, Waves } from "lucide-react";
 import { SectionHeading } from "./section-heading";
 import { ENTERTAINMENT } from "./data";
@@ -39,6 +40,30 @@ export function Entertainment() {
               </article>
             );
           })}
+        </div>
+
+        <div className="mt-8 grid overflow-hidden rounded-2xl border border-border bg-card shadow-sm lg:grid-cols-2">
+          <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto lg:min-h-80">
+            <Image
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7-Au9U7XeIrUXkQxmfdijKW8qKBIEdgZ.jpg"
+              alt="Children enjoy a hands-on craft activity together inside the farm barn"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
+          <div className="flex flex-col justify-center p-6 sm:p-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">For every generation</p>
+            <h3
+              className="mt-3 font-serif text-3xl font-medium leading-tight text-foreground sm:text-4xl"
+              style={{ textShadow: "0 2px 12px color-mix(in oklab, var(--foreground) 12%, transparent)" }}
+            >
+              Little guests, lasting memories
+            </h3>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              From hands-on barn activities to pony rides and open-air games, younger guests have room to explore while the grown-ups celebrate.
+            </p>
+          </div>
         </div>
 
         <div className="mt-8 flex flex-col items-start gap-4 rounded-2xl bg-muted/40 p-6 sm:flex-row sm:items-center sm:justify-between">

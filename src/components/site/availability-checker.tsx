@@ -153,8 +153,13 @@ export function AvailabilityChecker({ availableDates }: AvailabilityCheckerProps
               <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
                 <span className="size-1.5 rounded-full bg-primary" /> Live date calendar
               </p>
-              <h3 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Find your day</h3>
-              <p className="mt-1 max-w-md text-sm leading-relaxed text-muted-foreground">
+<h3
+                    className="mt-2 font-serif text-3xl font-medium leading-tight tracking-tight text-foreground sm:text-4xl"
+                    style={{ textShadow: "0 2px 12px color-mix(in oklab, var(--foreground) 12%, transparent)" }}
+                  >
+                    Find your day
+                  </h3>
+                  <p className="mt-2 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
                 Select a date to see its current status. Open dates are updated by our venue team.
               </p>
               <p aria-live="polite" className="mt-1 text-xs text-muted-foreground">

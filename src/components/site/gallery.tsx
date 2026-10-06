@@ -40,10 +40,16 @@ export function Gallery() {
             <Sparkles className="h-3.5 w-3.5 text-amber-600" />
             <span className="h-px w-8 bg-gradient-to-l from-transparent to-amber-400/60" />
           </p>
-          <h2 className="font-serif text-4xl font-medium leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance">
+          <h2
+            className="font-serif text-4xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance"
+            style={{ textShadow: "0 2px 14px color-mix(in oklab, var(--foreground) 14%, transparent)" }}
+          >
             Every frame tells a story
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg text-balance">
+          <p
+            className="mt-5 text-lg leading-relaxed text-muted-foreground sm:text-xl text-balance"
+            style={{ textShadow: "0 1px 8px color-mix(in oklab, var(--foreground) 8%, transparent)" }}
+          >
             From the first dance under golden fairy lights to the confetti send-off through the trees,
             these are real moments from real weddings at Esperanza. Drag, swipe, or tap to explore —
             each image is a glimpse of what your day could look like.

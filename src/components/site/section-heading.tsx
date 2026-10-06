@@ -44,12 +44,16 @@ export function SectionHeading({
         </p>
       )}
       <h2
-        className="text-3xl font-semibold leading-tight tracking-tight text-foreground text-balance sm:text-4xl lg:text-5xl"
+        className="font-serif text-4xl font-medium leading-[1.05] tracking-tight text-foreground text-balance sm:text-5xl lg:text-6xl"
+        style={{ textShadow: "0 2px 14px color-mix(in oklab, var(--foreground) 14%, transparent)" }}
       >
         {title}
       </h2>
       {description && (
-        <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg text-balance">
+        <p
+          className="mt-5 text-lg leading-relaxed text-muted-foreground text-balance sm:text-xl"
+          style={{ textShadow: "0 1px 8px color-mix(in oklab, var(--foreground) 8%, transparent)" }}
+        >
           {description}
         </p>
       )}

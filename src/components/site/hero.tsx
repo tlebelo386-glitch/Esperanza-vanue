@@ -53,7 +53,7 @@ export function Hero() {
         aria-hidden="true"
       >
         <Image
-          src="/images/couple-dancing.jpg"
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LMP%20Kemp%20Troue-845-n47TltDQyyOmOfHgV3ySYAQBqGN7Kd.jpg"
           alt=""
           fill
           priority

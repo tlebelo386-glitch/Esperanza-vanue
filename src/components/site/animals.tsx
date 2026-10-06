@@ -41,10 +41,16 @@ export function Animals() {
             The signature
             <span className="h-px w-8 bg-amber-300/40" />
           </p>
-          <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-background text-balance sm:text-4xl lg:text-5xl">
+          <h2
+            className="font-serif text-4xl font-medium leading-[1.05] tracking-tight text-background text-balance sm:text-5xl lg:text-6xl"
+            style={{ textShadow: "0 2px 16px oklch(0.08 0.02 155 / 0.45)" }}
+          >
             Animals are the difference
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-background/95 sm:text-lg text-balance">
+          <p
+            className="mt-5 text-lg leading-relaxed text-background/95 sm:text-xl text-balance"
+            style={{ textShadow: "0 1px 10px oklch(0.08 0.02 155 / 0.4)" }}
+          >
             Most rustic venues have a farm aesthetic. Esperanza has a working farm — with horses,
             donkeys, cows, calves, sheep and free-roaming peacocks that your guests will actually
             meet. Below is what makes the day unforgettable.
