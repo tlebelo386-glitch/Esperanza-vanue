@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { Check, Crown, ArrowRight, Sparkles, CalendarDays, Sun, Moon } from "lucide-react";
 import { SectionHeading } from "./section-heading";
 import { PackageComparison } from "./package-comparison";
@@ -212,9 +213,14 @@ export function Packages({ packages }: { packages: Package[] }) {
 
         {/* Add-ons note */}
         <div className="mt-8 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-5 sm:flex-row sm:items-center">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
-            <Sparkles className="h-5 w-5" />
-          </span>
+          <Image
+            src="/images/love-heart-3d.png"
+            alt=""
+            aria-hidden="true"
+            width={72}
+            height={72}
+            className="size-16 shrink-0 object-contain drop-shadow-lg"
+          />
           <div className="flex-1">
             <p className="font-medium text-foreground">Every package can be tailored.</p>
             <p className="text-sm text-muted-foreground">

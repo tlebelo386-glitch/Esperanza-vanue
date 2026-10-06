@@ -93,6 +93,16 @@ export function Hero() {
           </span>
         </h1>
 
+        <Image
+          src="/images/love-rings-3d.png"
+          alt=""
+          aria-hidden="true"
+          width={64}
+          height={64}
+          className="reveal-up mx-auto mt-5 size-14 object-contain drop-shadow-xl sm:mt-6"
+          style={delay(200)}
+        />
+
         <p
           className="reveal-up mx-auto mt-6 max-w-2xl text-pretty text-sm leading-relaxed text-white/90 sm:mt-7 sm:text-lg"
           style={{ ...delay(260), textShadow: "0 1px 12px oklch(0.08 0.02 155 / 0.55)" }}

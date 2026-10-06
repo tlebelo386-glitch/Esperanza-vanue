@@ -14,7 +14,7 @@ export function ScrollProgress({ progress }: { progress: number }) {
       aria-hidden="true"
     >
       <div
-        className="h-full origin-left bg-gradient-to-r from-primary via-amber-500 to-primary transition-[width] duration-150"
+        className="h-full origin-left bg-gradient-to-r from-primary via-accent to-primary transition-[width] duration-150"
         style={{ width: `${progress * 100}%` }}
       />
     </div>

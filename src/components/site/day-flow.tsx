@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Clock, Sun, Sparkles, Wine, Moon, Heart, ArrowRight } from "lucide-react";
 import { SectionHeading } from "./section-heading";
 import { CONTACT } from "./data";
@@ -130,6 +131,40 @@ export function DayFlow() {
         <p className="mx-auto mt-3 max-w-3xl text-center font-serif text-base italic text-amber-700/70">
           &ldquo;Van die oggendkoffie tot die laaste dans — jou dag, jou storie.&rdquo;
         </p>
+
+        <div className="mt-10 grid overflow-hidden rounded-2xl border border-border bg-card shadow-premium sm:grid-cols-2">
+          <div className="relative aspect-[16/9] overflow-hidden sm:aspect-auto sm:min-h-72">
+            <Image
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LMP%20Kemp%20Troue-845-n47TltDQyyOmOfHgV3ySYAQBqGN7Kd.jpg"
+              alt="Wedding guests riding in a donkey cart through a green farm meadow"
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, 50vw"
+            />
+          </div>
+          <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">A signature farm moment</p>
+              <Image
+                src="/images/farm-botanical-3d.png"
+                alt=""
+                aria-hidden="true"
+                width={56}
+                height={56}
+                className="size-12 shrink-0 object-contain drop-shadow-md"
+              />
+            </div>
+            <h3
+              className="mt-3 font-serif text-3xl font-medium leading-tight text-foreground sm:text-4xl"
+              style={{ textShadow: "0 2px 12px color-mix(in oklab, var(--foreground) 12%, transparent)" }}
+            >
+              Make your entrance a memory
+            </h3>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+              Arrive by donkey cart beneath the trees, then let the celebration unfold. It&apos;s a little unexpected, wonderfully personal, and unmistakably Esperanza.
+            </p>
+          </div>
+        </div>
 
         {/* Timeline */}
         <ol className="relative mt-12 space-y-6 sm:space-y-8">

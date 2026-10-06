@@ -40,9 +40,19 @@ export function Footer() {
               rustic, animal-filled wedding & events venue. Affordable, flexible, and genuinely
               countryside.
             </p>
-            <p className="mt-4 font-serif text-lg italic text-amber-300">
-              &ldquo;{CONTACT.tagline}.&rdquo;
-            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Image
+                src="/images/love-rings-3d.png"
+                alt=""
+                aria-hidden="true"
+                width={40}
+                height={40}
+                className="size-9 shrink-0 object-contain drop-shadow-md"
+              />
+              <p className="font-serif text-lg italic text-accent">
+                &ldquo;{CONTACT.tagline}.&rdquo;
+              </p>
+            </div>
             <p className="mt-1 font-serif text-base italic text-amber-200/60">
               &ldquo;ŉ Troueplek met &apos;n verskil&rdquo;
             </p>
