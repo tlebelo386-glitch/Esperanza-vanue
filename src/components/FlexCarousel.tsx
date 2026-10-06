@@ -2,11 +2,49 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { Renderer, Program, Mesh, Triangle, Plane, Texture, RenderTarget } from 'ogl';
 
 import './FlexCarousel.css';
 
 const photo = id => `https://images.unsplash.com/${id}?w=1200&q=80&auto=format&fit=max`;
+
+interface CarouselItem {
+  src: string;
+  alt: string;
+  title: string;
+  category?: string;
+}
+
+interface FlexCarouselProps {
+  items?: CarouselItem[];
+  preset?: string;
+  intro?: string;
+  cardHeight?: number;
+  gap?: number;
+  radius?: number;
+  fit?: string;
+  lensWidth?: number;
+  lensHeight?: number;
+  tilt?: number;
+  roundness?: number;
+  bend?: number;
+  reach?: number;
+  curl?: string;
+  dispersion?: number;
+  liquid?: number;
+  followCursor?: boolean;
+  squeeze?: number;
+  focusOnClick?: boolean;
+  autoplay?: boolean;
+  interval?: number;
+  captions?: boolean;
+  captureWheel?: boolean;
+  onChange?: (index: number, item: CarouselItem) => void;
+  onSelect?: (index: number, item: CarouselItem) => void;
+  className?: string;
+  style?: CSSProperties;
+}
 
 const DEFAULT_ITEMS = [
   {
@@ -285,7 +323,7 @@ const FlexCarousel = ({
   onSelect,
   className = '',
   style
-}) => {
+}: FlexCarouselProps) => {
   const containerRef = useRef(null);
   const settingsRef = useRef(null);
   const itemsRef = useRef(items);

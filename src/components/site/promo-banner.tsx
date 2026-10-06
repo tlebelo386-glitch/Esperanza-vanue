@@ -7,63 +7,10 @@ import { CONTACT } from "./data";
 import { WhatsAppIcon } from "./icons";
 
 /**
- * Dismissible promo banner showing available last-minute / open dates.
- *
- * Generates 4-6 indicative "open" dates in the next 8-12 weeks (Fridays,
- * Saturdays, and a couple of weekday specials). The exact same dates are
- * shown on every load (deterministic from a fixed seed) so a couple
- * returning to the site sees consistent messaging.
- *
- * Dismissal is persisted in localStorage for 7 days, after which the banner
- * reappears.
+ * Dismissible banner of genuinely open dates from the venue calendar.
+ * The banner stays hidden when no open dates have been published.
+ * Dismissal is persisted in localStorage for 7 days, after which it reappears.
  */
-
-// Deterministic pseudo-random generator (mulberry32) so dates are stable across reloads.
-function mulberry32(seed: number) {
-  return function () {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function generateOpenDates(): { date: Date; label: string; isWeekend: boolean }[] {
-  const rand = mulberry32(20260930); // fixed seed — stable dates
-  const today = new Date();
-  const dates: { date: Date; label: string; isWeekend: boolean }[] = [];
-  const seen = new Set<string>();
-
-  // Generate 5 dates: 3 weekend (Fri/Sat) + 2 weekday specials
-  let attempts = 0;
-  while (dates.length < 5 && attempts < 200) {
-    attempts++;
-    const offsetDays = 21 + Math.floor(rand() * 70); // 3-13 weeks out
-    const d = new Date(today);
-    d.setDate(d.getDate() + offsetDays);
-    const day = d.getDay(); // 0=Sun, 5=Fri, 6=Sat
-    const isWeekend = day === 5 || day === 6;
-    const weekdaySpecial = !isWeekend && rand() < 0.25; // ~25% of weekdays
-    if (!isWeekend && !weekdaySpecial) continue;
-    const key = d.toISOString().slice(0, 10);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    dates.push({
-      date: d,
-      label: d.toLocaleDateString("en-ZA", {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }),
-      isWeekend,
-    });
-  }
-  // Sort chronologically
-  dates.sort((a, b) => a.date.getTime() - b.date.getTime());
-  return dates;
-}
 
 interface AvailableDate {
   date: string;
@@ -108,8 +55,7 @@ export function PromoBanner() {
       setDismissed(false);
     }
 
-    // Fetch real available dates from the API. Falls back to client-side
-    // generation if the API is unreachable or returns no dates.
+    // Only show dates the venue has actually published as open.
     let cancelled = false;
     fetch("/api/available-dates?status=open&weeks=12")
       .then((res) => res.json())
@@ -130,15 +76,9 @@ export function PromoBanner() {
             note: d.note,
           };
         });
-        if (display.length > 0) {
-          setOpenDates(display);
-        } else {
-          setOpenDates(generateOpenDates());
-        }
+        if (display.length > 0) setOpenDates(display);
       })
-      .catch(() => {
-        setOpenDates(generateOpenDates());
-      });
+      .catch(() => undefined);
 
     return () => {
       cancelled = true;

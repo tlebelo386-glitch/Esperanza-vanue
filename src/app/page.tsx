@@ -97,7 +97,10 @@ async function getTestimonials(): Promise<Testimonial[]> {
 }
 
 export default async function Home() {
-  const [packages, testimonials] = await Promise.all([getPackages(), getTestimonials()]);
+  const [packages, testimonials] = await Promise.all([
+    getPackages(),
+    getTestimonials(),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -127,7 +130,7 @@ export default async function Home() {
         {/* Availability checker — interactive date-checking widget */}
         <section id="availability" className="scroll-mt-20 bg-muted/40 pb-20 sm:pb-28">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <AvailabilityChecker />
+            <AvailabilityChecker availableDates={[]} />
           </div>
         </section>
         <ServicesTable />

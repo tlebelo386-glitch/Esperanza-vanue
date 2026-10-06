@@ -44,7 +44,7 @@ const ROWS: ServiceRow[] = [
   { category: "Venue", feature: "Choice of 4 ceremony settings", selfCatering: true, fullService: true, kidsParty: false },
   { category: "Venue", feature: "Two dressing rooms included", selfCatering: true, fullService: true, kidsParty: true },
   { category: "Venue", feature: "Fairy-light installation (3,000m)", selfCatering: true, fullService: true, kidsParty: true },
-  { category: "Catering", feature: "Bring your own caterer", selfCatering: true, fullService: false, detail: "Full-service includes in-house catering to your budget" },
+  { category: "Catering", feature: "Bring your own caterer", selfCatering: true, fullService: false, kidsParty: false, detail: "Full-service includes in-house catering to your budget" },
   { category: "Catering", feature: "In-house catering to budget", selfCatering: false, fullService: true, kidsParty: "partial", detail: "Kids parties can add catering" },
   { category: "Catering", feature: "Braai facilities on site", selfCatering: true, fullService: true, kidsParty: true },
   { category: "Bar", feature: "On-site bar & snack bar", selfCatering: true, fullService: true, kidsParty: "partial", detail: "Cash bar available for kids parties" },

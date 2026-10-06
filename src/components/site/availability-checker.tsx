@@ -1,15 +1,25 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { Calendar, CheckCircle2, AlertCircle, XCircle, Loader2, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useMemo, useState } from "react";
+import useSWR from "swr";
+import {
+  ArrowRight,
+  CalendarDays,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  CircleHelp,
+  Clock3,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
 import { CONTACT } from "./data";
 import { WhatsAppIcon } from "./icons";
 import { cn } from "@/lib/utils";
 
-type Status = "available" | "limited" | "booked" | null;
+type AvailabilityStatus = "open" | "held" | "booked" | "limited" | "unknown";
 
-interface AvailableDate {
+export interface AvailableDate {
   date: string;
   status: string;
   isWeekend: boolean;
@@ -17,298 +27,343 @@ interface AvailableDate {
   note: string | null;
 }
 
-const STATUS_CONFIG: Record<Exclude<Status, null>, { label: string; icon: typeof CheckCircle2; color: string; bg: string; border: string; description: string }> = {
-  available: {
-    label: "Available",
-    icon: CheckCircle2,
-    color: "text-emerald-700",
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    description: "This date is open. Send an enquiry to secure it — we'll hold it for 48 hours while we finalise your quote.",
-  },
-  limited: {
-    label: "Limited availability",
-    icon: AlertCircle,
-    color: "text-amber-700",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    description: "We have one viewing slot left on this date, or it's a peak date with limited package options. Enquire now to avoid missing out.",
-  },
-  booked: {
-    label: "Fully booked",
-    icon: XCircle,
-    color: "text-rose-700",
-    bg: "bg-rose-50",
-    border: "border-rose-200",
-    description: "This date is already taken. Try the next available weekend, or ask about our Friday/Sunday rates.",
-  },
+interface AvailabilityCheckerProps {
+  availableDates: AvailableDate[];
+}
+
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH_FORMATTER = new Intl.DateTimeFormat("en-ZA", { month: "long", year: "numeric" });
+const LONG_DATE_FORMATTER = new Intl.DateTimeFormat("en-ZA", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+const SHORT_DATE_FORMATTER = new Intl.DateTimeFormat("en-ZA", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+});
+
+const STATUS_LABELS: Record<AvailabilityStatus, string> = {
+  open: "Available",
+  held: "On hold",
+  booked: "Booked",
+  limited: "Limited availability",
+  unknown: "Not yet listed",
 };
 
-export function AvailabilityChecker() {
-  const [date, setDate] = useState("");
-  const [checked, setChecked] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<Status>(null);
-  const [openDates, setOpenDates] = useState<AvailableDate[]>([]);
+function formatDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
-  // Fetch all open dates once on mount, so we can check the picked date against them
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/available-dates?status=open&weeks=26")
-      .then((res) => res.json())
-      .then((data) => {
-        if (cancelled || !data.ok || !Array.isArray(data.dates)) return;
-        setOpenDates(data.dates);
-      })
-      .catch(() => {
-        // If the API is unreachable, fall back to pseudo-random (below)
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+function getMonthDays(month: Date) {
+  const firstWeekday = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
+  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const cells = Array.from({ length: 42 }, (_, index) => {
+    const day = index - firstWeekday + 1;
+    return day > 0 && day <= daysInMonth ? new Date(month.getFullYear(), month.getMonth(), day) : null;
+  });
+  return Array.from({ length: 6 }, (_, week) => cells.slice(week * 7, week * 7 + 7));
+}
 
-  const today = new Date().toISOString().split("T")[0];
+async function fetchAvailableDates(url: string): Promise<AvailableDate[]> {
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) throw new Error("Availability could not be loaded.");
+  const payload = (await response.json()) as { dates?: AvailableDate[] };
+  return payload.dates ?? [];
+}
 
-  const handleCheck = useCallback(async () => {
-    if (!date) return;
-    setLoading(true);
-    setChecked(false);
-    setStatus(null);
-
-    // Simulate a short "checking" delay for UX feedback
-    await new Promise((r) => setTimeout(r, 600));
-
-    // Look up the picked date against the real available-dates from the API
-    const matched = openDates.find((d) => d.date === date);
-    let result: Status;
-
-    if (matched) {
-      // The date is in our "open" list — definitely available
-      result = "available";
-    } else if (openDates.length === 0) {
-      // API returned no dates (or failed) — fall back to pseudo-random so the
-      // widget still gives a reasonable answer
-      result = pseudoRandomStatus(date);
-    } else {
-      // Date isn't in our open list. It might be booked, held, or just not yet
-      // released. Use a deterministic heuristic so the same date always gives
-      // the same answer.
-      const isWeekend = (() => {
-        const d = new Date(date + "T00:00:00");
-        const day = d.getDay();
-        return day === 5 || day === 6;
-      })();
-      // Weekends are more likely to be booked; weekdays more likely limited
-      result = isWeekend ? pseudoRandomStatus(date, 0.4, 0.35) : pseudoRandomStatus(date, 0.6, 0.25);
+export function AvailabilityChecker({ availableDates }: AvailabilityCheckerProps) {
+  const { data, isLoading, error } = useSWR(
+    "/api/available-dates?status=all&weeks=52",
+    fetchAvailableDates,
+    {
+      fallbackData: availableDates,
+      refreshInterval: 60_000,
+      revalidateOnFocus: true,
     }
+  );
+  const liveAvailableDates = data ?? availableDates;
+  const today = useMemo(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }, []);
+  const [month, setMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selectedDate, setSelectedDate] = useState("");
+  const lastAvailableMonth = new Date(today.getFullYear(), today.getMonth() + 12, 1);
 
-    setStatus(result);
-    setLoading(false);
-    setChecked(true);
-  }, [date, openDates]);
+  const datesByKey = useMemo(
+    () => new Map(liveAvailableDates.map((date) => [date.date.slice(0, 10), date])),
+    [liveAvailableDates]
+  );
+  const weeks = useMemo(() => getMonthDays(month), [month]);
+  const selectedRecord = selectedDate ? datesByKey.get(selectedDate) : undefined;
+  const status = (selectedRecord?.status as AvailabilityStatus | undefined) ?? "unknown";
+  const isBeforeCurrentMonth =
+    month.getFullYear() === today.getFullYear() && month.getMonth() <= today.getMonth();
+  const isAfterAvailabilityWindow = month >= lastAvailableMonth;
 
-  function reset() {
-    setDate("");
-    setChecked(false);
-    setStatus(null);
-  }
+  const upcomingOpenDates = useMemo(
+    () =>
+      liveAvailableDates
+        .filter((date) => date.status === "open" && date.date.slice(0, 10) >= formatDateKey(today))
+        .sort((first, second) => first.date.localeCompare(second.date))
+        .slice(0, 3),
+    [liveAvailableDates, today]
+  );
 
-  const waLink = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
-    date
-      ? `Hi Esperanza, I checked availability for ${date} on your website. Can you confirm?`
+  const formattedSelectedDate = selectedDate
+    ? LONG_DATE_FORMATTER.format(new Date(`${selectedDate}T12:00:00`))
+    : "Choose a date to see its status";
+
+  const whatsappLink = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
+    selectedDate
+      ? `Hi Esperanza, could you confirm availability for ${formattedSelectedDate}?`
       : "Hi Esperanza, I'd like to check availability for a wedding date."
   )}`;
 
-  // Show the next 3 open dates as quick-pick suggestions
-  const nextOpenDates = openDates.slice(0, 3);
+  function chooseDate(dateKey: string) {
+    setSelectedDate(dateKey);
+  }
+
+  function showMonth(offset: number) {
+    setMonth((current) => new Date(current.getFullYear(), current.getMonth() + offset, 1));
+  }
+
+  function getDayStatus(dateKey: string): AvailabilityStatus {
+    const record = datesByKey.get(dateKey);
+    if (!record) return "unknown";
+    if (record.status === "open" || record.status === "held" || record.status === "booked" || record.status === "limited") {
+      return record.status;
+    }
+    return "unknown";
+  }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      {/* Decorative corner accent */}
-      <div
-        className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-20 blur-2xl"
-        style={{ background: "oklch(0.50 0.08 55)" }}
-        aria-hidden="true"
-      />
-
-      <div className="relative">
-        <div className="flex items-start gap-4">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-            <Calendar className="h-6 w-6" />
-          </span>
-          <div className="flex-1">
-            <h3 className="font-serif text-xl font-semibold text-foreground sm:text-2xl">
-              Check a date
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Pick your preferred date for an instant indication of availability. Final
-              confirmation is always via WhatsApp or an in-person viewing.
-            </p>
+    <div className="overflow-hidden rounded-[1.75rem] border border-border/80 bg-card shadow-premium-lg">
+      <div className="grid lg:grid-cols-[minmax(0,1.12fr)_minmax(19rem,0.88fr)]">
+        <div className="p-5 sm:p-7 lg:p-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
+                <span className="size-1.5 rounded-full bg-primary" /> Live date calendar
+              </p>
+              <h3 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Find your day</h3>
+              <p className="mt-1 max-w-md text-sm leading-relaxed text-muted-foreground">
+                Select a date to see its current status. Open dates are updated by our venue team.
+              </p>
+              <p aria-live="polite" className="mt-1 text-xs text-muted-foreground">
+                {isLoading ? "Checking the latest venue availability…" : error ? "Availability couldn’t be refreshed. Please contact the venue to confirm." : "Live availability · refreshed automatically"}
+              </p>
+            </div>
+            <span className="hidden size-11 shrink-0 place-items-center rounded-2xl bg-primary/8 text-primary sm:grid">
+              <CalendarDays className="size-5" />
+            </span>
           </div>
-        </div>
 
-        {/* Quick-pick open dates */}
-        {nextOpenDates.length > 0 && (
-          <div className="mt-5">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Or pick an open date:
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {nextOpenDates.map((d) => (
-                <button
-                  key={d.date}
-                  type="button"
-                  onClick={() => {
-                    setDate(d.date);
-                    setChecked(false);
-                    setStatus(null);
-                  }}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                    date === d.date
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:border-primary/30"
-                  )}
-                >
-                  <Calendar className="h-3 w-3" />
-                  {new Date(d.date + "T00:00:00").toLocaleDateString("en-ZA", {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
+          <div className="mt-7 flex items-center justify-between gap-3">
+            <div aria-live="polite">
+              <p className="font-serif text-lg font-semibold text-foreground">{MONTH_FORMATTER.format(month)}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">Choose a day to view availability</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => showMonth(-1)}
+                disabled={isBeforeCurrentMonth}
+                aria-label="Previous month"
+                className="grid size-9 place-items-center rounded-full border border-border text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => showMonth(1)}
+                disabled={isAfterAvailabilityWindow}
+                aria-label="Next month"
+                className="grid size-9 place-items-center rounded-full border border-border text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          </div>
+
+          <div role="grid" aria-label={`${MONTH_FORMATTER.format(month)} availability`} className="mt-4">
+            <div role="row" className="grid grid-cols-7 pb-2">
+              {WEEKDAYS.map((weekday) => (
+                <div key={weekday} role="columnheader" className="py-1 text-center text-[10px] font-semibold uppercase tracking-wide text-muted-foreground sm:text-xs">
+                  {weekday}
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col gap-1">
+              {weeks.map((week, weekIndex) => (
+                <div key={weekIndex} role="row" className="grid grid-cols-7 gap-1">
+                  {week.map((day, dayIndex) => {
+                    if (!day) return <div key={`empty-${weekIndex}-${dayIndex}`} role="gridcell" aria-hidden="true" />;
+                    const dateKey = formatDateKey(day);
+                    const dayStatus = getDayStatus(dateKey);
+                    const isPast = day < today;
+                    const isSelected = selectedDate === dateKey;
+                    const isToday = dateKey === formatDateKey(today);
+                    const record = datesByKey.get(dateKey);
+                    const isOpen = dayStatus === "open";
+                    const isHeld = dayStatus === "held" || dayStatus === "limited";
+                    const isBooked = dayStatus === "booked";
+                    return (
+                      <div key={dateKey} role="gridcell" aria-selected={isSelected}>
+                        <button
+                          type="button"
+                          disabled={isPast}
+                          aria-label={`${LONG_DATE_FORMATTER.format(day)} — ${isPast ? "past date" : STATUS_LABELS[dayStatus]}${record?.note ? `, ${record.note}` : ""}`}
+                          aria-pressed={isSelected}
+                          title={record?.note ?? STATUS_LABELS[dayStatus]}
+                          onClick={() => chooseDate(dateKey)}
+                          className={cn(
+                            "relative flex aspect-square w-full flex-col items-center justify-center gap-0.5 rounded-xl text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                            isPast && "cursor-not-allowed text-muted-foreground/35",
+                            !isPast && !isSelected && "text-foreground hover:bg-muted",
+                            isToday && !isSelected && "font-semibold ring-1 ring-inset ring-primary/40",
+                            isOpen && !isSelected && "font-semibold text-primary",
+                            isHeld && !isSelected && "bg-accent/10 text-foreground",
+                            isBooked && !isSelected && "text-muted-foreground line-through decoration-border",
+                            dayStatus === "unknown" && !isPast && "text-foreground/80",
+                            isSelected && "bg-primary font-semibold text-primary-foreground shadow-sm"
+                          )}
+                        >
+                          <span>{day.getDate()}</span>
+                          {isOpen && !isSelected && <span className="size-1 rounded-full bg-primary" aria-hidden="true" />}
+                          {isHeld && !isSelected && <span className="size-1 rounded-full bg-accent" aria-hidden="true" />}
+                          {isBooked && !isSelected && <span className="size-1 rounded-full bg-muted-foreground/50" aria-hidden="true" />}
+                        </button>
+                      </div>
+                    );
                   })}
-                  {d.discount && (
-                    <span className="rounded bg-amber-200 px-1 text-[9px] font-bold text-amber-900">
-                      -{d.discount}%
-                    </span>
-                  )}
-                </button>
+                </div>
               ))}
             </div>
           </div>
-        )}
 
-        {/* Date picker + check button */}
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1 space-y-1.5">
-            <label htmlFor="availability-date" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Preferred date
-            </label>
-            <input
-              id="availability-date"
-              type="date"
-              min={today}
-              value={date}
-              onChange={(e) => { setDate(e.target.value); setChecked(false); setStatus(null); }}
-              className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
+          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t border-border pt-4 text-[11px] text-muted-foreground sm:text-xs">
+            <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-primary" /> Available</span>
+            <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-accent" /> On hold</span>
+            <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-muted-foreground/50" /> Booked</span>
+            <span className="inline-flex items-center gap-1.5"><CircleHelp className="size-3" /> Not listed</span>
           </div>
-          <Button
-            type="button"
-            onClick={handleCheck}
-            disabled={!date || loading}
-            className="h-11 shrink-0 rounded-full sm:px-6"
-          >
-            {loading ? (
+
+          {upcomingOpenDates.length > 0 && (
+            <div className="mt-5">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Next open dates</p>
+              <div className="flex flex-wrap gap-2">
+                {upcomingOpenDates.map((date) => (
+                  <button
+                    key={date.date}
+                    type="button"
+                    onClick={() => {
+                      const parsed = new Date(`${date.date.slice(0, 10)}T12:00:00`);
+                      setMonth(new Date(parsed.getFullYear(), parsed.getMonth(), 1));
+                      chooseDate(date.date.slice(0, 10));
+                    }}
+                    className={cn(
+                      "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary/40 hover:bg-primary/5",
+                      selectedDate === date.date.slice(0, 10) ? "border-primary bg-primary/8 text-primary" : "border-border text-foreground/75"
+                    )}
+                  >
+                    {SHORT_DATE_FORMATTER.format(new Date(`${date.date.slice(0, 10)}T12:00:00`))}
+                    {date.discount ? <span className="ml-1.5 text-primary">−{date.discount}%</span> : null}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <aside className="flex flex-col border-t border-border bg-muted/35 p-5 sm:p-7 lg:border-l lg:border-t-0 lg:p-8">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Your selected date</p>
+            <span className={cn(
+              "rounded-full px-2.5 py-1 text-[10px] font-semibold",
+              selectedDate && status === "open" ? "bg-primary/10 text-primary" :
+                selectedDate && (status === "held" || status === "limited") ? "bg-accent/15 text-foreground" :
+                  selectedDate && status === "booked" ? "bg-muted text-muted-foreground" : "bg-background text-muted-foreground"
+            )}>
+              {selectedDate ? STATUS_LABELS[status] : "Select a date"}
+            </span>
+          </div>
+
+          <div className="mt-5 min-h-24">
+            {selectedDate ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Checking...
+                <p className="font-serif text-2xl font-semibold leading-tight text-foreground">{formattedSelectedDate}</p>
+                {selectedRecord?.discount ? (
+                  <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-primary"><Sparkles className="size-3.5" />{selectedRecord.discount}% weekday offer</p>
+                ) : null}
+                {selectedRecord?.note ? <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{selectedRecord.note}</p> : null}
+              </>
+            ) : (
+              <p className="font-serif text-2xl font-medium leading-tight text-foreground">A day worth looking forward to.</p>
+            )}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-border/80 bg-card p-4">
+            {selectedDate && status === "open" ? (
+              <>
+                <p className="flex items-center gap-2 text-sm font-semibold text-primary"><Check className="size-4" /> This date is currently open</p>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Send us a note and our team will confirm the details and next steps with you personally.</p>
+              </>
+            ) : selectedDate && (status === "held" || status === "limited") ? (
+              <>
+                <p className="flex items-center gap-2 text-sm font-semibold text-foreground"><Clock3 className="size-4 text-accent" /> This date is on hold</p>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">A date enquiry is already in progress. Ask us about its current status or nearby open dates.</p>
+              </>
+            ) : selectedDate && status === "booked" ? (
+              <>
+                <p className="flex items-center gap-2 text-sm font-semibold text-foreground"><CalendarDays className="size-4 text-muted-foreground" /> This date is booked</p>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Let us help you find another day with the same atmosphere and setting.</p>
+              </>
+            ) : selectedDate ? (
+              <>
+                <p className="flex items-center gap-2 text-sm font-semibold text-foreground"><CircleHelp className="size-4 text-accent" /> This date is not listed yet</p>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">We don&apos;t have a published status for this day. Message the venue team for a personal confirmation.</p>
               </>
             ) : (
               <>
-                Check availability
-                <ArrowRight className="h-4 w-4" />
+                <p className="flex items-center gap-2 text-sm font-semibold text-foreground"><CalendarDays className="size-4 text-primary" /> Availability, at a glance</p>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Open dates are marked in green. Dates without a status haven&apos;t been published to the calendar yet.</p>
               </>
             )}
-          </Button>
-        </div>
-
-        {/* Result */}
-        {checked && status && (
-          <div className={cn("mt-5 animate-float-up rounded-xl border p-4", STATUS_CONFIG[status].bg, STATUS_CONFIG[status].border)}>
-            <div className="flex items-start gap-3">
-              <StatusIcon status={status} />
-              <div className="flex-1">
-                <p className={cn("font-serif text-lg font-semibold", STATUS_CONFIG[status].color)}>
-                  {STATUS_CONFIG[status].label}
-                </p>
-                <p className="mt-1 text-sm text-foreground/80">
-                  {STATUS_CONFIG[status].description}
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Date checked: <span className="font-medium text-foreground">{new Date(date + "T00:00:00").toLocaleDateString("en-ZA", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
-                </p>
-
-                {/* Action buttons based on status */}
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {status !== "booked" && (
-                    <>
-                      <Button asChild size="sm" className="h-9 rounded-full">
-                        <a href="#enquiry">Enquire now</a>
-                      </Button>
-                      <Button asChild size="sm" variant="outline" className="h-9 rounded-full">
-                        <a href={waLink} target="_blank" rel="noopener noreferrer">
-                          <WhatsAppIcon className="h-4 w-4" />
-                          Confirm on WhatsApp
-                        </a>
-                      </Button>
-                    </>
-                  )}
-                  {status === "booked" && (
-                    <Button asChild size="sm" variant="outline" className="h-9 rounded-full">
-                      <a href="#enquiry">Find alternative dates</a>
-                    </Button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={reset}
-                    className="inline-flex h-9 items-center rounded-full px-4 text-sm font-medium text-muted-foreground hover:text-foreground"
-                  >
-                    Check another date
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
-        )}
 
-        {/* Trust note */}
-        <p className="mt-4 text-[11px] text-muted-foreground">
-          Availability reflects our live calendar. A real person confirms within 24-48 hours. Dates
-          are held for 48 hours after enquiry while we finalise your quote.
-        </p>
+          <div className="mt-auto pt-6">
+            <a
+              href={selectedDate && status === "booked" ? "#availability" : `#enquiry`}
+              onClick={() => {
+                if (selectedDate && status === "booked") setSelectedDate("");
+              }}
+              className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-all hover:-translate-y-0.5 hover:bg-primary/90"
+            >
+              {selectedDate && status === "booked" ? "Browse another date" : "Enquire about this date"}
+              <ArrowRight className="size-4" />
+            </a>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2.5 flex min-h-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-sm font-medium text-foreground/75 transition-colors hover:bg-background"
+            >
+              <WhatsAppIcon className="size-4" /> Ask us on WhatsApp
+            </a>
+            <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[10px] leading-relaxed text-muted-foreground">
+              <MapPin className="size-3 shrink-0" /> {CONTACT.addressShort} <span aria-hidden="true">·</span> A real person confirms every date
+            </p>
+          </div>
+        </aside>
       </div>
     </div>
-  );
-}
-
-/**
- * Deterministic pseudo-random fallback for when the API returns no dates
- * or the picked date isn't in the open list.
- * `availThreshold` and `limitedThreshold` let callers bias the distribution
- * (e.g. weekends are more likely booked).
- */
-function pseudoRandomStatus(
-  dateStr: string,
-  availThreshold = 0.5,
-  limitedThreshold = 0.3
-): Status {
-  let hash = 0;
-  for (let i = 0; i < dateStr.length; i++) {
-    hash = ((hash << 5) - hash + dateStr.charCodeAt(i)) | 0;
-  }
-  const ratio = (Math.abs(hash) % 100) / 100;
-  if (ratio < availThreshold) return "available";
-  if (ratio < availThreshold + limitedThreshold) return "limited";
-  return "booked";
-}
-
-function StatusIcon({ status }: { status: Exclude<Status, null> }) {
-  const config = STATUS_CONFIG[status];
-  const Icon = config.icon;
-  return (
-    <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/60", config.color)}>
-      <Icon className="h-5 w-5" />
-    </span>
   );
 }
