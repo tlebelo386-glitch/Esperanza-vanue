@@ -6,6 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-hero-foreground: var(--hero-foreground);
   --font-sans: "Manrope", "Manrope Fallback";
   --font-serif: "Cormorant Garamond", "Cormorant Garamond Fallback";
   --font-mono: "Manrope", "Manrope Fallback";
@@ -53,21 +54,22 @@
 
 :root {
   --radius: 0.9rem;
-  --shadow-ink: oklch(0.24 0.035 153);
-  --background: oklch(0.985 0.006 105);
-  --foreground: oklch(0.22 0.035 153);
-  --card: oklch(0.995 0.005 96);
+  --shadow-ink: oklch(0.22 0.03 153);
+  --background: oklch(0.98 0.008 102);
+  --foreground: oklch(0.22 0.03 153);
+  --hero-foreground: oklch(0.985 0.006 96);
+  --card: oklch(0.995 0.004 98);
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: oklch(0.32 0.075 153);
+  --primary: oklch(0.3 0.07 153);
   --primary-foreground: oklch(0.985 0.006 96);
-  --secondary: oklch(0.95 0.012 95);
+  --secondary: oklch(0.945 0.012 98);
   --secondary-foreground: var(--foreground);
-  --muted: oklch(0.955 0.012 95);
-  --muted-foreground: oklch(0.48 0.03 150);
-  --accent: oklch(0.76 0.105 78);
-  --accent-foreground: oklch(0.25 0.045 150);
+  --muted: oklch(0.95 0.01 100);
+  --muted-foreground: oklch(0.47 0.027 150);
+  --accent: oklch(0.74 0.1 79);
+  --accent-foreground: oklch(0.23 0.035 153);
   --love: oklch(0.76 0.07 12);
   --destructive: oklch(0.56 0.19 28);
   --border: oklch(0.89 0.018 112);
@@ -90,9 +92,10 @@
 
 .dark {
   --shadow-ink: oklch(0.08 0.02 153);
-  --background: oklch(0.17 0.025 153);
+  --background: oklch(0.16 0.025 153);
   --foreground: oklch(0.96 0.012 96);
-  --card: oklch(0.215 0.027 153);
+  --hero-foreground: oklch(0.985 0.006 96);
+  --card: oklch(0.21 0.027 153);
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
