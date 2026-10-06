@@ -2,32 +2,27 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { Calendar, MapPin, ChevronDown, Heart } from "lucide-react";
+import { Calendar, ChevronDown, MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CONTACT } from "./data";
-import { WhatsAppIcon, StarIcon } from "./icons";
-import { CountUp } from "./count-up";
+import { WhatsAppIcon } from "./icons";
 
-/** Inline style helper for staggered entrance delays */
 const delay = (ms: number) => ({ "--reveal-delay": `${ms}ms` }) as React.CSSProperties;
 
 export function Hero() {
   const bgRef = useRef<HTMLDivElement | null>(null);
 
-  // Parallax written straight to the DOM node — no React re-render on every scroll frame.
   useEffect(() => {
     const el = bgRef.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let raf = 0;
     let ticking = false;
     const update = () => {
       ticking = false;
       const y = window.scrollY;
-      // Stop doing work once the hero is off-screen
       if (y > window.innerHeight * 1.2) return;
-      el.style.transform = `translate3d(0, ${y * 0.3}px, 0) scale(1.08)`;
+      el.style.transform = `translate3d(0, ${y * 0.2}px, 0) scale(1.06)`;
     };
     const onScroll = () => {
       if (ticking) return;
@@ -51,11 +46,10 @@ export function Hero() {
       className="relative flex min-h-[100svh] items-center justify-center overflow-hidden"
       aria-label="Esperanza Wedding Venue — hero"
     >
-      {/* Parallax background — next/image gives us priority loading + responsive sizes (better LCP) */}
       <div
         ref={bgRef}
         className="absolute inset-0 z-0 will-change-transform"
-        style={{ transform: "scale(1.08)" }}
+        style={{ transform: "scale(1.06)" }}
         aria-hidden="true"
       >
         <Image
@@ -69,85 +63,47 @@ export function Hero() {
         />
       </div>
 
-      {/* Cinematic overlay */}
       <div
         className="absolute inset-0 z-0"
         aria-hidden="true"
         style={{
           background:
-            "linear-gradient(180deg, oklch(0.10 0.03 50 / 0.65) 0%, oklch(0.10 0.03 50 / 0.45) 35%, oklch(0.10 0.03 50 / 0.78) 100%), radial-gradient(ellipse 80% 50% at 50% 45%, oklch(0.10 0.03 50 / 0.5) 0%, oklch(0.10 0.03 50 / 0.72) 70%, oklch(0.10 0.03 50 / 0.88) 100%)",
-        }}
-      />
-      {/* Warm gold ambient glow */}
-      <div
-        className="absolute inset-0 z-0"
-        aria-hidden="true"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 40% at 50% 60%, oklch(0.78 0.13 75 / 0.14) 0%, transparent 70%)",
+            "linear-gradient(180deg, oklch(0.12 0.025 155 / 0.58) 0%, oklch(0.12 0.025 155 / 0.42) 42%, oklch(0.12 0.025 155 / 0.83) 100%), radial-gradient(ellipse 80% 58% at 50% 44%, oklch(0.12 0.025 155 / 0.18) 0%, oklch(0.12 0.025 155 / 0.48) 100%)",
         }}
       />
 
-      {/* Fade into the page background so the ticker below doesn't meet a hard edge */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-32 bg-gradient-to-t from-black/40 to-transparent"
-        aria-hidden="true"
-      />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-36 bg-gradient-to-t from-foreground/30 to-transparent" aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto w-full max-w-5xl px-4 py-24 text-center sm:px-6">
-        <div className="reveal-up" style={delay(0)}>
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white backdrop-blur-md">
-            <MapPin className="h-3.5 w-3.5" />
-            Pretoria East · Gauteng
-          </span>
-        </div>
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24 pt-28 text-center sm:px-8 sm:pb-28 sm:pt-32">
+        <p
+          className="reveal-up inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-white/85 sm:text-sm"
+          style={delay(0)}
+        >
+          <MapPin className="size-3.5 text-accent" aria-hidden="true" />
+          Pretoria East <span className="text-white/45">/</span> Gauteng
+        </p>
 
         <h1
-          className="reveal-up mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl"
-          style={{
-            ...delay(120),
-            fontFamily: "var(--font-playfair), Georgia, serif",
-            textShadow: "0 2px 8px rgba(0,0,0,0.5), 0 0 32px rgba(0,0,0,0.3)",
-          }}
+          className="reveal-up mx-auto mt-6 max-w-5xl text-balance font-serif text-5xl font-medium leading-[0.95] tracking-[-0.035em] text-white sm:mt-8 sm:text-7xl lg:text-8xl"
+          style={{ ...delay(120), textShadow: "0 2px 24px oklch(0.08 0.02 155 / 0.35)" }}
         >
-          A wedding venue with a{" "}
-          <span className="relative inline-block">
-            <span className="bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 bg-clip-text text-transparent">
-              difference
-            </span>
-            <svg
-              className="absolute -bottom-2 left-0 h-2 w-full text-amber-300/70"
-              viewBox="0 0 200 8"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M2 5 Q 50 1 100 4 T 198 5"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-                pathLength={1}
-                strokeDasharray={1}
-                strokeDashoffset={1}
-                style={{ animation: "hero-underline 1.1s 0.9s cubic-bezier(0.22,1,0.36,1) forwards" }}
-              />
-            </svg>
+          <span className="block">A wedding venue</span>
+          <span className="mt-1 block">
+            with a <em className="font-serif font-medium italic text-accent">difference.</em>
           </span>
         </h1>
 
         <p
-          className="reveal-up mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/95 sm:text-lg"
-          style={{ ...delay(260), textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}
+          className="reveal-up mx-auto mt-6 max-w-2xl text-pretty text-sm leading-relaxed text-white/90 sm:mt-7 sm:text-lg"
+          style={{ ...delay(260), textShadow: "0 1px 12px oklch(0.08 0.02 155 / 0.55)" }}
         >
-          A working equestrian farm on the banks of the Pienaars River. Forest chapel, barn
-          reception strung with fairy lights, horses &amp; donkeys serving drinks — a real
-          countryside wedding, not a manicured one.
+          A working equestrian farm beside the Pienaars River. Say your vows beneath the trees,
+          celebrate in a barn strung with fairy lights, and let the horses and donkeys welcome your guests.
         </p>
 
         <p
-          className="reveal-up mx-auto mt-4 max-w-xl font-serif text-lg italic leading-relaxed text-amber-200/90 sm:text-xl"
-          style={{ ...delay(360), textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}
+          className="reveal-up mx-auto mt-4 font-serif text-lg italic leading-relaxed text-white/85 sm:text-xl"
+          style={{ ...delay(360), textShadow: "0 1px 8px oklch(0.08 0.02 155 / 0.5)" }}
         >
           &ldquo;ŉ Troue met &apos;n verskil — waar die plaas die fees is.&rdquo;
         </p>
@@ -159,10 +115,10 @@ export function Hero() {
           <Button
             asChild
             size="lg"
-            className="group h-12 rounded-full px-7 text-base shadow-gold-glow transition-transform hover:-translate-y-0.5"
+            className="group h-12 w-full rounded-full px-7 text-base shadow-gold-glow transition-transform hover:-translate-y-0.5 sm:w-auto"
           >
             <a href="#enquiry">
-              <Calendar className="h-5 w-5 transition-transform group-hover:rotate-6" />
+              <Calendar className="size-5 transition-transform group-hover:rotate-6" />
               Book a viewing
             </a>
           </Button>
@@ -170,83 +126,39 @@ export function Hero() {
             href={waLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/60 bg-white/15 px-7 text-base font-medium text-white backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-white/25 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-            style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-white/55 bg-white/10 px-7 text-base font-medium text-white backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-white/20 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:w-auto"
           >
-            <WhatsAppIcon className="h-5 w-5" />
+            <WhatsAppIcon className="size-5" />
             WhatsApp Marina
           </a>
         </div>
 
-        {/* Quick stats — count up when they scroll into view */}
-        <dl
-          className="reveal-up mx-auto mt-12 grid max-w-2xl grid-cols-3 gap-2 sm:gap-6"
+        <div
+          className="reveal-up mx-auto mt-9 flex max-w-2xl flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-white/25 pt-5 text-xs text-white/85 sm:mt-11 sm:text-sm"
           style={delay(580)}
         >
-          <div className="rounded-xl border border-white/20 bg-black/30 px-2 py-4 backdrop-blur-md transition-colors hover:border-amber-300/40 sm:px-3">
-            <dt className="flex items-center justify-center gap-1 text-xs uppercase tracking-wider text-white/80">
-              <StarIcon className="h-3 w-3 text-amber-300" />
-              Google rating
-            </dt>
-            <dd className="mt-1 font-serif text-2xl font-semibold text-white sm:text-3xl">
-              <CountUp to={CONTACT.stats.rating} decimals={1} />
-              <span className="text-base text-white/70">/5</span>
-            </dd>
-            <dd className="text-[11px] text-white/75">{CONTACT.stats.reviewCount} reviews</dd>
-          </div>
-          <div className="rounded-xl border border-white/20 bg-black/30 px-2 py-4 backdrop-blur-md transition-colors hover:border-amber-300/40 sm:px-3">
-            <dt className="text-xs uppercase tracking-wider text-white/80">Facebook</dt>
-            <dd className="mt-1 font-serif text-2xl font-semibold text-white sm:text-3xl">
-              <CountUp to={CONTACT.stats.fbLikes} group />
-              <span className="text-base text-white/70">+</span>
-            </dd>
-            <dd className="text-[11px] text-white/75">
-              likes &amp; {CONTACT.stats.fbCheckins.toLocaleString("en-US")} check-ins
-            </dd>
-          </div>
-          <div className="rounded-xl border border-white/20 bg-black/30 px-2 py-4 backdrop-blur-md transition-colors hover:border-amber-300/40 sm:px-3">
-            <dt className="text-xs uppercase tracking-wider text-white/80">Instagram</dt>
-            <dd className="mt-1 font-serif text-2xl font-semibold text-white sm:text-3xl">
-              <CountUp to={CONTACT.stats.igPosts} />
-              <span className="text-base text-white/70">+</span>
-            </dd>
-            <dd className="text-[11px] text-white/75">real-wedding posts</dd>
-          </div>
-        </dl>
-
-        <p
-          className="reveal-up mt-10 inline-flex items-center gap-1.5 text-xs text-white/80"
-          style={delay(700)}
-        >
-          <Heart className="h-3 w-3 text-rose-300" />
-          Affordable · Self-catering or full-service · Pet friendly
-        </p>
-        <p
-          className="reveal-up mt-2 font-serif text-sm italic text-amber-200/70"
-          style={delay(760)}
-        >
-          Bekostigbaar · Self-katering of vol-diens · Troeteldier-vriendelik
-        </p>
+          <span className="inline-flex items-center gap-1.5">
+            <Star className="size-3.5 fill-accent text-accent" aria-hidden="true" />
+            <strong className="font-semibold text-white">{CONTACT.stats.rating}/5</strong>
+            <span>on Google</span>
+          </span>
+          <span className="hidden text-white/45 sm:inline" aria-hidden="true">·</span>
+          <span>{CONTACT.stats.reviewCount} couple reviews</span>
+          <span className="hidden text-white/45 sm:inline" aria-hidden="true">·</span>
+          <span>Self-catering or full-service</span>
+        </div>
       </div>
 
-      {/* Scroll hint */}
       <a
         href="#about"
         aria-label="Scroll to about section"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+        className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <span className="flex flex-col items-center gap-1.5 text-[10px] uppercase tracking-[0.2em]">
-          Scroll
-          <ChevronDown className="h-4 w-4 animate-bounce motion-reduce:animate-none" />
+          Explore
+          <ChevronDown className="size-4 animate-bounce motion-reduce:animate-none" />
         </span>
       </a>
-
-      <style>{`
-        @keyframes hero-underline { to { stroke-dashoffset: 0; } }
-        @media (prefers-reduced-motion: reduce) {
-          #top svg path { animation: none !important; stroke-dashoffset: 0 !important; }
-        }
-      `}</style>
     </section>
   );
 }
