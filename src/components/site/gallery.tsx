@@ -1,29 +1,50 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import dynamic from "next/dynamic";
+import { useMemo, useState } from "react";
 import { Filter, Sparkles, ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { GALLERY_IMAGES } from "./data";
-import FlexCarousel from "@/components/FlexCarousel";
+import { GALLERY_IMAGES, CONTACT } from "./data";
+import { useInView } from "./use-in-view";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { CONTACT } from "./data";
 import { WhatsAppIcon } from "./icons";
+
+const FlexCarousel = dynamic(() => import("@/components/FlexCarousel"), {
+  ssr: false,
+  loading: () => (
+    <div role="status" className="grid h-full place-items-center rounded-3xl bg-muted/50">
+      <span className="sr-only">Loading venue gallery…</span>
+    </div>
+  ),
+});
 
 const CATEGORIES = ["All", "Ceremony", "Reception", "Animals", "Details", "Rooms"] as const;
 type Category = (typeof CATEGORIES)[number];
+const CATEGORY_COUNTS = Object.fromEntries(
+  CATEGORIES.map((category) => [
+    category,
+    category === "All" ? GALLERY_IMAGES.length : GALLERY_IMAGES.filter((image) => image.category === category).length,
+  ])
+) as Record<Category, number>;
 
 export function Gallery() {
   const [category, setCategory] = useState<Category>("All");
+  const [carouselRef, carouselVisible] = useInView<HTMLDivElement>(0.01);
 
   const filtered = useMemo(
     () => (category === "All" ? GALLERY_IMAGES : GALLERY_IMAGES.filter((img) => img.category === category)),
     [category]
   );
-
-  const changeCategory = useCallback((cat: Category) => {
-    setCategory(cat);
-  }, []);
+  const carouselItems = useMemo(
+    () => filtered.map((img) => ({
+      src: img.src,
+      alt: img.alt,
+      title: img.tag,
+      category: img.category,
+    })),
+    [filtered]
+  );
 
   const waLink = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
     "Hi Esperanza, I saw your gallery and I'd love to view the venue."
@@ -72,48 +93,46 @@ export function Gallery() {
             <Filter className="h-3 w-3" />
             Filter:
           </span>
-          {CATEGORIES.map((cat) => {
-            const count = cat === "All" ? GALLERY_IMAGES.length : GALLERY_IMAGES.filter((i) => i.category === cat).length;
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => changeCategory(cat)}
-                className={cn(
-                  "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all duration-300 hover:scale-105",
-                  category === cat
-                    ? "border-transparent bg-gold-gradient text-black shadow-gold-glow"
-                    : "border-border bg-card text-foreground/70 hover:border-primary/30 hover:text-foreground"
-                )}
-              >
-                {cat}
-                <span className={cn("rounded-full px-1.5 text-[10px]", category === cat ? "bg-black/20" : "bg-muted")}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setCategory(cat)}
+              className={cn(
+                "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all duration-300 hover:scale-105",
+                category === cat
+                  ? "border-transparent bg-gold-gradient text-black shadow-gold-glow"
+                  : "border-border bg-card text-foreground/70 hover:border-primary/30 hover:text-foreground"
+              )}
+            >
+              {cat}
+              <span className={cn("rounded-full px-1.5 text-[10px]", category === cat ? "bg-black/20" : "bg-muted")}>
+                {CATEGORY_COUNTS[cat]}
+              </span>
+            </button>
+          ))}
         </div>
 
-        {/* ═══ WebGL FlexCarousel — the only view ═══ */}
-        <div className="mt-8" style={{ width: "100%", height: "560px", position: "relative" }}>
-          <FlexCarousel
-            items={filtered.map((img) => ({
-              src: img.src,
-              alt: img.alt,
-              title: img.tag,
-              category: img.category,
-            }))}
-            preset="liquid"
-            intro="rise"
-            cardHeight={0.54}
-            gap={12}
-            squeeze={0.2}
-            focusOnClick
-            autoplay
-            interval={5}
-            captions
-          />
+        <div
+          ref={carouselRef}
+          className="relative mt-8 h-[min(70vh,35rem)] min-h-[25rem] w-full"
+        >
+          {carouselVisible ? (
+            <FlexCarousel
+              items={carouselItems}
+              preset="liquid"
+              intro="rise"
+              cardHeight={0.54}
+              gap={12}
+              squeeze={0.2}
+              focusOnClick
+              autoplay
+              interval={5}
+              captions
+            />
+          ) : (
+            <div className="h-full rounded-3xl bg-muted/30" aria-hidden="true" />
+          )}
         </div>
 
         {/* ═══ Premium CTA strip ═══ */}
