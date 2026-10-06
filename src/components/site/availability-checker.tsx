@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import useSWR from "swr";
 import {
   ArrowRight,
   CalendarDays,
@@ -69,7 +70,24 @@ function getMonthDays(month: Date) {
   return Array.from({ length: 6 }, (_, week) => cells.slice(week * 7, week * 7 + 7));
 }
 
+async function fetchAvailableDates(url: string): Promise<AvailableDate[]> {
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) throw new Error("Availability could not be loaded.");
+  const payload = (await response.json()) as { dates?: AvailableDate[] };
+  return payload.dates ?? [];
+}
+
 export function AvailabilityChecker({ availableDates }: AvailabilityCheckerProps) {
+  const { data, isLoading, error } = useSWR(
+    "/api/available-dates?status=all&weeks=52",
+    fetchAvailableDates,
+    {
+      fallbackData: availableDates,
+      refreshInterval: 60_000,
+      revalidateOnFocus: true,
+    }
+  );
+  const liveAvailableDates = data ?? availableDates;
   const today = useMemo(() => {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -80,8 +98,8 @@ export function AvailabilityChecker({ availableDates }: AvailabilityCheckerProps
   const lastAvailableMonth = new Date(today.getFullYear(), today.getMonth() + 12, 1);
 
   const datesByKey = useMemo(
-    () => new Map(availableDates.map((date) => [date.date.slice(0, 10), date])),
-    [availableDates]
+    () => new Map(liveAvailableDates.map((date) => [date.date.slice(0, 10), date])),
+    [liveAvailableDates]
   );
   const weeks = useMemo(() => getMonthDays(month), [month]);
   const selectedRecord = selectedDate ? datesByKey.get(selectedDate) : undefined;
@@ -92,11 +110,11 @@ export function AvailabilityChecker({ availableDates }: AvailabilityCheckerProps
 
   const upcomingOpenDates = useMemo(
     () =>
-      availableDates
+      liveAvailableDates
         .filter((date) => date.status === "open" && date.date.slice(0, 10) >= formatDateKey(today))
         .sort((first, second) => first.date.localeCompare(second.date))
         .slice(0, 3),
-    [availableDates, today]
+    [liveAvailableDates, today]
   );
 
   const formattedSelectedDate = selectedDate
@@ -138,6 +156,9 @@ export function AvailabilityChecker({ availableDates }: AvailabilityCheckerProps
               <h3 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Find your day</h3>
               <p className="mt-1 max-w-md text-sm leading-relaxed text-muted-foreground">
                 Select a date to see its current status. Open dates are updated by our venue team.
+              </p>
+              <p aria-live="polite" className="mt-1 text-xs text-muted-foreground">
+                {isLoading ? "Checking the latest venue availability…" : error ? "Availability couldn’t be refreshed. Please contact the venue to confirm." : "Live availability · refreshed automatically"}
               </p>
             </div>
             <span className="hidden size-11 shrink-0 place-items-center rounded-2xl bg-primary/8 text-primary sm:grid">

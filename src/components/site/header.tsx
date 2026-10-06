@@ -16,6 +16,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
@@ -180,6 +181,9 @@ export function Header() {
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[min(90vw,25rem)] gap-0 border-l border-border bg-background p-0">
                   <SheetTitle className="sr-only">Esperanza navigation</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Navigate venue sections and check date availability.
+                  </SheetDescription>
                   <div className="flex h-full flex-col">
                     <div className="border-b border-border px-6 pb-5 pt-8">
                       <div className="flex items-center gap-3">

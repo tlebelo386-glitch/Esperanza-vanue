@@ -1,105 +1,127 @@
+import { randomUUID } from "node:crypto";
+import { and, asc, eq, gte, lte } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/lib/db";
+import { availabilityDates, type AvailabilityStatus } from "@/lib/availability-schema";
+import { getAvailabilityDb } from "@/lib/availability-db";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-/**
- * GET /api/available-dates
- * Returns all available dates, optionally filtered by status.
- * Query params:
- *   - status: "open" | "held" | "booked" (default: "open")
- *   - weeks: number of weeks ahead to look (default: 12)
- */
+const STATUS_VALUES = ["open", "held", "booked", "limited"] as const;
+const dateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD")
+  .refine((value) => {
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+  }, "Enter a valid calendar date");
+
+const createSchema = z.object({
+  date: dateSchema,
+  status: z.enum(STATUS_VALUES).optional(),
+  isWeekend: z.boolean().optional(),
+  discount: z.number().int().min(0).max(100).nullable().optional(),
+  note: z.string().trim().max(500).nullable().optional(),
+});
+
+function dateKeyInSouthAfrica(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Johannesburg",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function addDays(dateKey: string, days: number) {
+  const date = new Date(`${dateKey}T12:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function isVenueWeekend(dateKey: string) {
+  const weekday = new Date(`${dateKey}T00:00:00.000Z`).getUTCDay();
+  return weekday === 5 || weekday === 6;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get("status") || "open";
-    const weeks = Math.min(Number(searchParams.get("weeks") || 12), 26);
+    const status = searchParams.get("status") ?? "open";
+    if (status !== "all" && !STATUS_VALUES.includes(status as AvailabilityStatus)) {
+      return NextResponse.json({ ok: false, error: "Invalid availability status" }, { status: 400 });
+    }
 
-    const dates = await db.availableDate.findMany({
-      where: status === "all" ? undefined : { status },
-      orderBy: { date: "asc" },
-    });
+    const requestedWeeks = Number(searchParams.get("weeks") ?? 12);
+    const weeks = Number.isFinite(requestedWeeks)
+      ? Math.min(52, Math.max(1, Math.floor(requestedWeeks)))
+      : 12;
+    const from = dateKeyInSouthAfrica(new Date());
+    const through = addDays(from, weeks * 7);
+    const db = getAvailabilityDb();
+    const dates = await db
+      .select()
+      .from(availabilityDates)
+      .where(
+        and(
+          gte(availabilityDates.date, from),
+          lte(availabilityDates.date, through),
+          status === "all" ? undefined : eq(availabilityDates.status, status as AvailabilityStatus)
+        )
+      )
+      .orderBy(asc(availabilityDates.date));
 
-    // If no dates in DB, fall back to generating indicative ones client-side
-    // (the promo banner handles this). But if we have dates, filter by weeks.
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() + weeks * 7);
-
-    const filtered = dates.filter((d) => {
-      const date = new Date(d.date);
-      return date >= new Date() && date <= cutoff;
-    });
-
-    return NextResponse.json({
-      ok: true,
-      dates: filtered,
-      source: filtered.length > 0 ? "database" : "fallback",
-    });
-  } catch (err) {
-    console.error("[available-dates/GET]", err);
     return NextResponse.json(
-      { ok: false, error: "Failed to fetch available dates" },
-      { status: 500 }
+      { ok: true, dates, source: "database" },
+      { headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
+  } catch (error) {
+    console.error("[available-dates/GET]", error);
+    return NextResponse.json(
+      { ok: false, error: "Failed to fetch venue availability" },
+      { status: 500, headers: { "Cache-Control": "no-store, max-age=0" } }
     );
   }
 }
 
-const createSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD"),
-  status: z.enum(["open", "held", "booked"]).optional(),
-  isWeekend: z.boolean().optional(),
-  discount: z.number().int().min(0).max(100).optional(),
-  note: z.string().optional(),
-});
-
-/**
- * POST /api/available-dates
- * Creates or upserts an available date. Used by the admin to manage availability.
- */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const parsed = createSchema.safeParse(body);
-
     if (!parsed.success) {
-      return NextResponse.json(
-        { ok: false, errors: parsed.error.flatten() },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, errors: parsed.error.flatten() }, { status: 400 });
     }
 
-    const d = parsed.data;
-    const date = await db.availableDate.upsert({
-      where: { date: d.date },
-      create: {
-        date: d.date,
-        status: d.status ?? "open",
-        isWeekend: d.isWeekend ?? isWeekend(d.date),
-        discount: d.discount ?? null,
-        note: d.note ?? null,
-      },
-      update: {
-        ...(d.status ? { status: d.status } : {}),
-        ...(d.isWeekend !== undefined ? { isWeekend: d.isWeekend } : {}),
-        ...(d.discount !== undefined ? { discount: d.discount } : {}),
-        ...(d.note !== undefined ? { note: d.note } : {}),
-      },
-    });
+    const input = parsed.data;
+    const db = getAvailabilityDb();
+    const [date] = await db
+      .insert(availabilityDates)
+      .values({
+        id: randomUUID(),
+        date: input.date,
+        status: input.status ?? "open",
+        isWeekend: input.isWeekend ?? isVenueWeekend(input.date),
+        discount: input.discount ?? null,
+        note: input.note ?? null,
+      })
+      .onConflictDoUpdate({
+        target: availabilityDates.date,
+        set: {
+          ...(input.status !== undefined ? { status: input.status } : {}),
+          ...(input.isWeekend !== undefined ? { isWeekend: input.isWeekend } : {}),
+          ...(input.discount !== undefined ? { discount: input.discount } : {}),
+          ...(input.note !== undefined ? { note: input.note } : {}),
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
 
-    return NextResponse.json({ ok: true, date }, { status: 201 });
-  } catch (err) {
-    console.error("[available-dates/POST]", err);
-    return NextResponse.json(
-      { ok: false, error: "Failed to create available date" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: true, date }, { status: 200 });
+  } catch (error) {
+    console.error("[available-dates/POST]", error);
+    return NextResponse.json({ ok: false, error: "Failed to save venue availability" }, { status: 500 });
   }
-}
-
-function isWeekend(dateStr: string): boolean {
-  const d = new Date(dateStr + "T00:00:00");
-  const day = d.getDay();
-  return day === 5 || day === 6; // Friday or Saturday
 }

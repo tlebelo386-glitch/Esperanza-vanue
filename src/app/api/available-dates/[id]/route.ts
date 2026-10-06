@@ -1,61 +1,60 @@
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { z } from "zod";
+import { availabilityDates } from "@/lib/availability-schema";
+import { getAvailabilityDb } from "@/lib/availability-db";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-/**
- * DELETE /api/available-dates/[id]
- * Removes an available date from the calendar.
- * Used by the admin panel's "Manage dates" tab.
- */
+const updateSchema = z.object({
+  status: z.enum(["open", "held", "booked", "limited"]),
+});
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    await db.availableDate.delete({ where: { id } });
+    const [deleted] = await getAvailabilityDb()
+      .delete(availabilityDates)
+      .where(eq(availabilityDates.id, id))
+      .returning({ id: availabilityDates.id });
+
+    if (!deleted) {
+      return NextResponse.json({ ok: false, error: "Availability date not found" }, { status: 404 });
+    }
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("[available-dates/[id]/DELETE]", err);
-    return NextResponse.json(
-      { ok: false, error: "Failed to delete available date" },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error("[available-dates/[id]/DELETE]", error);
+    return NextResponse.json({ ok: false, error: "Failed to remove venue availability" }, { status: 500 });
   }
 }
 
-/**
- * PATCH /api/available-dates/[id]
- * Updates an available date's status (open | held | booked).
- */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const body = await req.json();
-    const { status } = body as { status?: string };
-
-    if (status && !["open", "held", "booked"].includes(status)) {
-      return NextResponse.json(
-        { ok: false, error: "Status must be open, held, or booked" },
-        { status: 400 }
-      );
+    const parsed = updateSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, errors: parsed.error.flatten() }, { status: 400 });
     }
 
-    const updated = await db.availableDate.update({
-      where: { id },
-      data: status ? { status } : {},
-    });
+    const [date] = await getAvailabilityDb()
+      .update(availabilityDates)
+      .set({ status: parsed.data.status, updatedAt: new Date() })
+      .where(eq(availabilityDates.id, id))
+      .returning();
 
-    return NextResponse.json({ ok: true, date: updated });
-  } catch (err) {
-    console.error("[available-dates/[id]/PATCH]", err);
-    return NextResponse.json(
-      { ok: false, error: "Failed to update available date" },
-      { status: 500 }
-    );
+    if (!date) {
+      return NextResponse.json({ ok: false, error: "Availability date not found" }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true, date });
+  } catch (error) {
+    console.error("[available-dates/[id]/PATCH]", error);
+    return NextResponse.json({ ok: false, error: "Failed to update venue availability" }, { status: 500 });
   }
 }

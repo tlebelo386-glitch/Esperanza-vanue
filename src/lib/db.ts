@@ -8,9 +8,13 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 const defaultDatabasePath = resolve(process.cwd(), 'db/custom.db')
-const databaseUrl = process.env.DATABASE_URL ?? `file:${defaultDatabasePath}`
+const configuredDatabaseUrl = process.env.DATABASE_URL
+// Prisma is configured for SQLite; the Neon URL is used by the availability service instead.
+const databaseUrl = configuredDatabaseUrl?.startsWith('file:')
+  ? configuredDatabaseUrl
+  : `file:${defaultDatabasePath}`
 
-if (!process.env.DATABASE_URL) {
+if (!configuredDatabaseUrl?.startsWith('file:')) {
   mkdirSync(resolve(process.cwd(), 'db'), { recursive: true })
 }
 
