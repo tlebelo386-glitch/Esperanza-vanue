@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar } from "lucide-react";
 import { WhatsAppIcon } from "./icons";
 import { CONTACT } from "./data";
 import { cn } from "@/lib/utils";
 
 /**
  * Mobile-only sticky bottom bar that appears after the hero is scrolled past.
- * Gives mobile users persistent, fast access to the two most important CTAs.
+ * Gives mobile users persistent, fast access to the venue's preferred contact method.
  */
 export function MobileEnquireBar() {
   const [show, setShow] = useState(false);
@@ -35,22 +34,15 @@ export function MobileEnquireBar() {
       aria-label="Quick contact"
     >
       <div className="border-t border-border bg-card/95 backdrop-blur-md shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center gap-2 px-3 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
+        <div className="px-3 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
           <a
             href={waLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100"
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-medium text-primary-foreground shadow-premium transition-colors hover:bg-primary/90"
           >
             <WhatsAppIcon className="h-4 w-4" />
-            WhatsApp
-          </a>
-          <a
-            href="#enquiry"
-            className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <Calendar className="h-4 w-4" />
-            Enquire
+            WhatsApp us
           </a>
         </div>
       </div>

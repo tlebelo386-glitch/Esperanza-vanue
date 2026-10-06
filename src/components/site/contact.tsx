@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "./section-heading";
 import { EnquiryForm } from "./enquiry-form";
 import { Newsletter } from "./newsletter";
@@ -7,108 +7,105 @@ import { CONTACT } from "./data";
 import { WhatsAppIcon } from "./icons";
 
 export function Contact() {
-  const waMarina = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
-    "Hi Marina, I'd like to enquire about a date at Esperanza."
+  const waLink = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
+    "Hi Esperanza, I'd like to arrange a viewing."
   )}`;
-  const waChrista = `https://wa.me/${CONTACT.whatsappChrista}?text=${encodeURIComponent(
-    "Hi Christa, I'd like to enquire about a date at Esperanza."
-  )}`;
-
   const mapEmbed = `https://www.google.com/maps?q=${CONTACT.mapQuery}&output=embed`;
 
   return (
     <section id="contact" className="scroll-mt-20 bg-muted/40 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
-          eyebrow="Get in touch"
-          title="Book a viewing"
-          description="Viewings are by appointment only — and mobile signal on the farm is poor for voice calls, so WhatsApp is by far the best first contact. Drop your details below and we'll WhatsApp you to set up a time."
+          eyebrow="Plan your visit"
+          title="Come and experience Esperanza"
+          description="The best way to picture your day is to walk the grounds. Viewings are by appointment; send us a WhatsApp or leave a note and we can arrange a time."
         />
 
-        <div className="mt-12 grid gap-8 lg:grid-cols-5">
-          {/* Contact details */}
-          <div className="space-y-6 lg:col-span-2">
-            {/* WhatsApp-first CTA */}
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-              <div className="flex items-center gap-3">
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-emerald-500 text-white">
-                  <WhatsAppIcon className="h-6 w-6" />
-                </span>
-                <div>
-                  <h3 className="font-serif text-lg font-semibold text-foreground">
-                    WhatsApp us first
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Mobile signal on the farm is poor — WhatsApp is the fastest reply.
-                  </p>
-                </div>
+        <div className="mt-12 grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:gap-8">
+          <aside className="flex flex-col gap-6">
+            <div className="overflow-hidden rounded-3xl bg-primary p-6 text-primary-foreground shadow-premium-xl sm:p-8">
+              <div className="flex size-12 items-center justify-center rounded-full border border-accent/50 bg-primary-foreground/5 text-accent">
+                <WhatsAppIcon className="size-6" aria-hidden="true" />
               </div>
-              <div className="mt-4 space-y-2">
-                <a
-                  href={waMarina}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg bg-background px-4 py-2.5 text-sm transition-colors hover:bg-emerald-100"
-                >
-                  <span>
-                    <span className="font-medium text-foreground">Marina</span>{" "}
-                    <span className="text-muted-foreground">· Owner</span>
-                  </span>
-                  <span className="font-mono text-xs text-foreground">{CONTACT.phoneMarinaDisplay}</span>
-                </a>
-                <a
-                  href={waChrista}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg bg-background px-4 py-2.5 text-sm transition-colors hover:bg-emerald-100"
-                >
-                  <span>
-                    <span className="font-medium text-foreground">Christa</span>{" "}
-                    <span className="text-muted-foreground">· Coordinator</span>
-                  </span>
-                  <span className="font-mono text-xs text-foreground">{CONTACT.phoneChristaDisplay}</span>
-                </a>
+              <p className="mt-6 text-xs font-medium uppercase tracking-[0.22em] text-accent">
+                A good place to start
+              </p>
+              <h3 className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">
+                Let&apos;s find a day to show you around.
+              </h3>
+              <p className="mt-4 text-sm leading-relaxed text-primary-foreground/75 sm:text-base">
+                WhatsApp is the most reliable way to reach us at the farm. Tell us a little
+                about what you&apos;re planning and we&apos;ll take it from there.
+              </p>
+              <a
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground shadow-premium transition hover:-translate-y-0.5 hover:shadow-premium-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+              >
+                <WhatsAppIcon className="size-5" aria-hidden="true" />
+                Arrange a viewing
+                <ArrowUpRight className="size-4" aria-hidden="true" />
+              </a>
+
+              <div className="mt-8 grid gap-3 border-t border-primary-foreground/15 pt-6">
+                <ContactRow
+                  icon={Phone}
+                  label="Call Marina"
+                  value={CONTACT.phoneMarinaDisplay}
+                  href={`tel:${CONTACT.phoneMarina.replace(/\s/g, "")}`}
+                  inverted
+                />
+                <ContactRow
+                  icon={Mail}
+                  label="Email"
+                  value={CONTACT.email}
+                  href={`mailto:${CONTACT.email}`}
+                  inverted
+                />
+                <ContactRow
+                  icon={Clock}
+                  label="Visits"
+                  value="By appointment"
+                  inverted
+                />
               </div>
             </div>
 
-            {/* Other contact methods */}
-            <div className="space-y-3 rounded-2xl border border-border bg-card p-5">
-              <ContactRow icon={Mail} label="Email" value={CONTACT.email} href={`mailto:${CONTACT.email}`} />
-              <ContactRow icon={Phone} label="Phone (Marina)" value={CONTACT.phoneMarinaDisplay} href={`tel:${CONTACT.phoneMarina.replace(/\s/g, "")}`} />
-              <ContactRow icon={Phone} label="Phone (Christa)" value={CONTACT.phoneChristaDisplay} href={`tel:${CONTACT.phoneChrista.replace(/\s/g, "")}`} />
-              <ContactRow icon={Clock} label="Hours" value="Viewings by appointment" />
-              <ContactRow icon={MapPin} label="Address" value={CONTACT.address} />
-            </div>
-
-            {/* Map */}
-            <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
+            <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-premium-lg">
               <iframe
-                title="Esperanza Wedding Venue location map"
+                title="Map showing Esperanza Wedding Venue in Mooiplaats, Pretoria East"
                 src={mapEmbed}
-                className="h-64 w-full"
+                className="h-64 w-full sm:h-72"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
+              <div className="flex items-start gap-3 p-5">
+                <MapPin className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Find us in Mooiplaats</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {CONTACT.addressShort}. Please request a pin before setting off; sat-nav can
+                    be misleading in the smallholdings.
+                  </p>
+                </div>
+              </div>
             </div>
-
-            <p className="flex items-start gap-2 text-xs text-muted-foreground">
-              <MessageCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              Visitors must request a pin location to find the property — the farm is in the
-              Mooiplaats smallholdings and sat-nav can be misleading.
-            </p>
-
-            {/* Directions card — turn-by-turn + landmarks + arrival info */}
             <Directions />
-          </div>
+          </aside>
 
-          {/* Form + Newsletter */}
-          <div className="space-y-6 lg:col-span-3">
-            <div id="enquiry" className="scroll-mt-24">
-              <div className="mb-4 flex items-center gap-2">
-                <h3 className="font-serif text-xl font-semibold text-foreground">Enquiry form</h3>
-                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary">
-                  Reply within 48h
-                </span>
+          <div className="flex flex-col gap-6">
+            <div id="enquiry" className="scroll-mt-24 rounded-3xl border border-border bg-card p-5 shadow-premium-lg sm:p-8">
+              <div className="mb-6 max-w-xl">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+                  Tell us about your plans
+                </p>
+                <h3 className="mt-2 font-serif text-3xl leading-tight text-foreground sm:text-4xl">
+                  Start a conversation
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                  Share what you have in mind, and we&apos;ll help you take the next step.
+                </p>
               </div>
               <EnquiryForm />
             </div>
@@ -125,27 +122,53 @@ function ContactRow({
   label,
   value,
   href,
+  inverted = false,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
   href?: string;
+  inverted?: boolean;
 }) {
   const inner = (
-    <div className="flex items-start gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/60">
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-        <Icon className="h-4 w-4" />
+    <div className="flex min-w-0 items-center gap-3 rounded-xl py-2 transition-colors">
+      <span
+        className={
+          inverted
+            ? "grid size-9 shrink-0 place-items-center rounded-full border border-primary-foreground/20 text-accent"
+            : "grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary"
+        }
+      >
+        <Icon className="size-4" aria-hidden="true" />
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+      <span className="min-w-0">
+        <span
+          className={
+            inverted
+              ? "block text-xs text-primary-foreground/65"
+              : "block text-xs text-muted-foreground"
+          }
+        >
           {label}
-        </p>
-        <p className="text-sm text-foreground break-words">{value}</p>
-      </div>
+        </span>
+        <span
+          className={
+            inverted
+              ? "block break-words text-sm font-medium text-primary-foreground"
+              : "block break-words text-sm font-medium text-foreground"
+          }
+        >
+          {value}
+        </span>
+      </span>
     </div>
   );
+
   return href ? (
-    <a href={href} className="block">
+    <a
+      href={href}
+      className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    >
       {inner}
     </a>
   ) : (

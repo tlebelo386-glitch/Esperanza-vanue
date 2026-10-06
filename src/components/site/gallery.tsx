@@ -110,6 +110,8 @@ export function Gallery() {
             gap={12}
             squeeze={0.2}
             focusOnClick
+            autoplay
+            interval={5}
             captions
           />
         </div>
