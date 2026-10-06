@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Filter, Sparkles, ArrowRight } from "lucide-react";
+import Image from "next/image";
 import { GALLERY_IMAGES } from "./data";
 import FlexCarousel from "@/components/FlexCarousel";
 import { cn } from "@/lib/utils";
@@ -33,12 +34,21 @@ export function Gallery() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* ═══ Premium section header ═══ */}
         <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-3 flex justify-center" aria-hidden="true">
+            <Image
+              src="/images/wedding-bouquet-3d.png"
+              alt=""
+              width={56}
+              height={56}
+              className="size-12 object-contain drop-shadow-md"
+            />
+          </div>
           <p className="mb-4 inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-gold-gradient">
-            <span className="h-px w-8 bg-gradient-to-r from-transparent to-amber-400/60" />
-            <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+            <span className="h-px w-8 bg-gradient-to-r from-transparent to-accent/60" />
+            <Sparkles className="h-3.5 w-3.5 text-accent-foreground" />
             Capture the moment
-            <Sparkles className="h-3.5 w-3.5 text-amber-600" />
-            <span className="h-px w-8 bg-gradient-to-l from-transparent to-amber-400/60" />
+            <Sparkles className="h-3.5 w-3.5 text-accent-foreground" />
+            <span className="h-px w-8 bg-gradient-to-l from-transparent to-accent/60" />
           </p>
           <h2
             className="font-serif text-4xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance"

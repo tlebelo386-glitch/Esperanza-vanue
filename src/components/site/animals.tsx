@@ -36,7 +36,16 @@ export function Animals() {
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="mb-3 flex items-center justify-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-amber-300">
+          <div className="mb-3 flex justify-center" aria-hidden="true">
+            <Image
+              src="/images/farm-horseshoe-3d.png"
+              alt=""
+              width={56}
+              height={56}
+              className="size-12 object-contain drop-shadow-md"
+            />
+          </div>
+          <p className="mb-3 flex items-center justify-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent">
             <span className="h-px w-8 bg-amber-300/40" />
             The signature
             <span className="h-px w-8 bg-amber-300/40" />

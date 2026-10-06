@@ -6,18 +6,18 @@ import { HorseIcon as Horse } from "./icons";
 
 const ACCENT_STYLES: Record<string, { ring: string; badge: string; icon: typeof TreePine }> = {
   forest: {
-    ring: "ring-emerald-200/60 hover:ring-emerald-400/70",
-    badge: "bg-emerald-100/90 text-emerald-800",
+    ring: "ring-primary/20 hover:ring-primary/40",
+    badge: "bg-primary/10 text-primary",
     icon: TreePine,
   },
   gold: {
-    ring: "ring-amber-200/60 hover:ring-amber-400/70",
-    badge: "bg-amber-100/90 text-amber-800",
+    ring: "ring-accent/30 hover:ring-accent/60",
+    badge: "bg-accent/20 text-accent-foreground",
     icon: Waves,
   },
   barn: {
-    ring: "ring-orange-200/60 hover:ring-orange-400/70",
-    badge: "bg-orange-100/90 text-orange-800",
+    ring: "ring-love/30 hover:ring-love/60",
+    badge: "bg-love/20 text-foreground",
     icon: Warehouse,
   },
 };
@@ -31,7 +31,7 @@ export function Chapels() {
           title="Four chapels, one property"
           description="Forest, dam, stables or garden — pick the setting that fits your day. Couples can enter on horseback, or arrive via donkey cart. All chapels are within easy walking distance of the barn reception."
         />
-        <p className="mx-auto mt-3 max-w-3xl text-center font-serif text-base italic text-amber-700/70">
+        <p className="mx-auto mt-3 max-w-3xl text-center font-serif text-base italic text-primary/75">
           &ldquo;Kies jou plek — woud, dam, stalle of tuin. Elke hoek van die plaas vertel &apos;n storie.&rdquo;
         </p>
 
@@ -90,12 +90,12 @@ export function Chapels() {
             <Horse className="h-6 w-6" />
           </span>
           <Image
-            src="/images/wedding-bouquet-3d.png"
-            alt=""
-            aria-hidden="true"
-            width={72}
-            height={72}
-            className="hidden size-16 shrink-0 object-contain drop-shadow-lg sm:block"
+src="/images/chapel-candle-3d.png"
+                    alt=""
+                    aria-hidden="true"
+                    width={80}
+                    height={80}
+                    className="hidden size-20 shrink-0 object-contain drop-shadow-lg sm:block"
           />
           <div className="flex-1">
             <h3 className="font-serif text-lg font-semibold text-foreground">

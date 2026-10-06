@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface SectionHeadingProps {
@@ -17,6 +18,15 @@ export function SectionHeading({
   className,
   id,
 }: SectionHeadingProps) {
+  const headingCopy = `${eyebrow ?? ""} ${title}`.toLowerCase();
+  const motifSrc = /farm|animal|barn|accommodation|capacity|equestrian|horse|venue/i.test(headingCopy)
+    ? "/images/farm-horseshoe-3d.png"
+    : /chapel|ceremony|included|checklist|viewing|garden/i.test(headingCopy)
+      ? "/images/wedding-bouquet-3d.png"
+      : /package|story|love|testimonial|wedding|day|memory|entertainment|moment|faq|contact/i.test(headingCopy)
+        ? "/images/love-rings-3d.png"
+        : "/images/farm-botanical-3d.png";
+
   return (
     <div
       id={id}
@@ -26,6 +36,20 @@ export function SectionHeading({
         className
       )}
     >
+      <div
+        className={cn("mb-3 flex", align === "center" ? "justify-center" : "justify-start")}
+        aria-hidden="true"
+      >
+        <span className="grid size-14 place-items-center rounded-full border border-accent/30 bg-card/80 shadow-premium-sm">
+          <Image
+            src={motifSrc}
+            alt=""
+            width={52}
+            height={52}
+            className="size-11 object-contain drop-shadow-md"
+          />
+        </span>
+      </div>
       {eyebrow && (
         <p
           className={cn(
@@ -35,9 +59,9 @@ export function SectionHeading({
         >
           {align === "center" && (
             <>
-              <span className="h-px w-10 bg-gradient-to-r from-transparent to-amber-500/50" aria-hidden="true" />
+              <span className="h-px w-10 bg-gradient-to-r from-transparent to-accent/50" aria-hidden="true" />
               {eyebrow}
-              <span className="h-px w-10 bg-gradient-to-l from-transparent to-amber-500/50" aria-hidden="true" />
+              <span className="h-px w-10 bg-gradient-to-l from-transparent to-accent/50" aria-hidden="true" />
             </>
           )}
           {align === "left" && eyebrow}

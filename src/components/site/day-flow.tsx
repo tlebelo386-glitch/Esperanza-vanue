@@ -143,7 +143,17 @@ export function DayFlow() {
             />
           </div>
           <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">A signature farm moment</p>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">A signature farm moment</p>
+              <Image
+                src="/images/farm-botanical-3d.png"
+                alt=""
+                aria-hidden="true"
+                width={56}
+                height={56}
+                className="size-12 shrink-0 object-contain drop-shadow-md"
+              />
+            </div>
             <h3
               className="mt-3 font-serif text-3xl font-medium leading-tight text-foreground sm:text-4xl"
               style={{ textShadow: "0 2px 12px color-mix(in oklab, var(--foreground) 12%, transparent)" }}
