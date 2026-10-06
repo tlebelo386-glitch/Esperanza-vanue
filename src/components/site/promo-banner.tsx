@@ -29,10 +29,10 @@ function mulberry32(seed: number) {
   };
 }
 
-function generateOpenDates(): { date: Date; label: string; isWeekend: boolean }[] {
+function generateOpenDates(): { date: Date; label: string; isWeekend: boolean; discount: null; note: null }[] {
   const rand = mulberry32(20260930); // fixed seed — stable dates
   const today = new Date();
-  const dates: { date: Date; label: string; isWeekend: boolean }[] = [];
+  const dates: { date: Date; label: string; isWeekend: boolean; discount: null; note: null }[] = [];
   const seen = new Set<string>();
 
   // Generate 5 dates: 3 weekend (Fri/Sat) + 2 weekday specials
@@ -58,6 +58,8 @@ function generateOpenDates(): { date: Date; label: string; isWeekend: boolean }[
         year: "numeric",
       }),
       isWeekend,
+      discount: null,
+      note: null,
     });
   }
   // Sort chronologically

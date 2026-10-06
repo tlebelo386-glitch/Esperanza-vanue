@@ -86,7 +86,7 @@ export function Gallery() {
               src: img.src,
               alt: img.alt,
               title: img.tag,
-              subtitle: img.category,
+              category: img.category,
             }))}
             preset="liquid"
             intro="rise"
