@@ -9,7 +9,7 @@ import { About } from "@/components/site/about";
 import { Chapels } from "@/components/site/chapels";
 import { BarnVenue } from "@/components/site/barn-venue";
 import { Packages, type Package } from "@/components/site/packages";
-import { AvailabilityChecker } from "@/components/site/availability-checker";
+import { AvailabilityChecker, type AvailableDate } from "@/components/site/availability-checker";
 import { Capacities } from "@/components/site/capacities";
 import { ServicesTable } from "@/components/site/services-table";
 import { Onboarding } from "@/components/site/onboarding";
@@ -96,8 +96,41 @@ async function getTestimonials(): Promise<Testimonial[]> {
   }
 }
 
+function toLocalDateKey(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+async function getAvailableDates(): Promise<AvailableDate[]> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const throughDate = new Date(today);
+  throughDate.setFullYear(throughDate.getFullYear() + 1);
+
+  try {
+    return await db.availableDate.findMany({
+      where: {
+        date: {
+          gte: toLocalDateKey(today),
+          lte: toLocalDateKey(throughDate),
+        },
+      },
+      orderBy: { date: "asc" },
+      select: { date: true, status: true, isWeekend: true, discount: true, note: true },
+    });
+  } catch (err) {
+    console.error("[page] failed to load availability, showing unlisted dates:", err);
+    return [];
+  }
+}
+
 export default async function Home() {
-  const [packages, testimonials] = await Promise.all([getPackages(), getTestimonials()]);
+  const [packages, testimonials, availableDates] = await Promise.all([
+    getPackages(),
+    getTestimonials(),
+    getAvailableDates(),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -127,7 +160,7 @@ export default async function Home() {
         {/* Availability checker — interactive date-checking widget */}
         <section id="availability" className="scroll-mt-20 bg-muted/40 pb-20 sm:pb-28">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <AvailabilityChecker />
+            <AvailabilityChecker availableDates={availableDates} />
           </div>
         </section>
         <ServicesTable />
