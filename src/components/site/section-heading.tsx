@@ -68,15 +68,13 @@ export function SectionHeading({
         </p>
       )}
       <h2
-        className="font-serif text-4xl font-medium leading-[1.05] tracking-tight text-foreground text-balance sm:text-5xl lg:text-6xl"
-        style={{ textShadow: "0 2px 14px color-mix(in oklab, var(--foreground) 14%, transparent)" }}
+        className="font-serif text-4xl font-medium leading-[1.08] tracking-tight text-foreground text-balance sm:text-5xl lg:text-6xl"
       >
         {title}
       </h2>
       {description && (
         <p
           className="mt-5 text-lg leading-relaxed text-muted-foreground text-balance sm:text-xl"
-          style={{ textShadow: "0 1px 8px color-mix(in oklab, var(--foreground) 8%, transparent)" }}
         >
           {description}
         </p>
