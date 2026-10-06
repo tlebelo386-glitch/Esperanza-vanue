@@ -193,6 +193,14 @@ export function RealWeddings() {
 
         {/* CTA */}
         <div className="mt-10 flex flex-col items-center gap-4 rounded-2xl bg-foreground p-6 text-center text-background sm:flex-row sm:text-left">
+          <Image
+            src="/images/love-rings-3d.png"
+            alt=""
+            aria-hidden="true"
+            width={88}
+            height={88}
+            className="size-20 shrink-0 object-contain drop-shadow-xl"
+          />
           <div className="flex-1">
             <h3 className="font-serif text-xl font-semibold text-background sm:text-2xl">
               Your wedding could be next.

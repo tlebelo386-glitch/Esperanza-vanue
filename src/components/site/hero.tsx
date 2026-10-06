@@ -53,7 +53,7 @@ export function Hero() {
         aria-hidden="true"
       >
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LMP%20Kemp%20Troue-845-n47TltDQyyOmOfHgV3ySYAQBqGN7Kd.jpg"
+          src="/images/couple-dancing.jpg"
           alt=""
           fill
           priority
@@ -92,6 +92,16 @@ export function Hero() {
             with a <em className="font-serif font-medium italic text-accent">difference.</em>
           </span>
         </h1>
+
+        <Image
+          src="/images/love-rings-3d.png"
+          alt=""
+          aria-hidden="true"
+          width={64}
+          height={64}
+          className="reveal-up mx-auto mt-5 size-14 object-contain drop-shadow-xl sm:mt-6"
+          style={delay(200)}
+        />
 
         <p
           className="reveal-up mx-auto mt-6 max-w-2xl text-pretty text-sm leading-relaxed text-white/90 sm:mt-7 sm:text-lg"

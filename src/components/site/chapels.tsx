@@ -89,6 +89,14 @@ export function Chapels() {
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
             <Horse className="h-6 w-6" />
           </span>
+          <Image
+            src="/images/wedding-bouquet-3d.png"
+            alt=""
+            aria-hidden="true"
+            width={72}
+            height={72}
+            className="hidden size-16 shrink-0 object-contain drop-shadow-lg sm:block"
+          />
           <div className="flex-1">
             <h3 className="font-serif text-lg font-semibold text-foreground">
               Arrive on horseback, or by donkey cart
