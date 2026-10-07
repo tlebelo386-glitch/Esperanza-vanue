@@ -10,12 +10,12 @@
   --font-sans: "Manrope", "Manrope Fallback";
   --font-serif: "Cormorant Garamond", "Cormorant Garamond Fallback";
   --font-mono: "Manrope", "Manrope Fallback";
-  --shadow-xs: 0 1px 2px color-mix(in oklab, var(--shadow-ink) 7%, transparent);
-  --shadow-sm: 0 1px 3px color-mix(in oklab, var(--shadow-ink) 8%, transparent), 0 3px 8px color-mix(in oklab, var(--shadow-ink) 4%, transparent);
-  --shadow-md: 0 2px 5px color-mix(in oklab, var(--shadow-ink) 8%, transparent), 0 8px 18px color-mix(in oklab, var(--shadow-ink) 7%, transparent);
-  --shadow-lg: 0 4px 8px color-mix(in oklab, var(--shadow-ink) 8%, transparent), 0 14px 30px color-mix(in oklab, var(--shadow-ink) 9%, transparent);
-  --shadow-xl: 0 6px 14px color-mix(in oklab, var(--shadow-ink) 9%, transparent), 0 24px 48px color-mix(in oklab, var(--shadow-ink) 11%, transparent);
-  --shadow-2xl: 0 12px 24px color-mix(in oklab, var(--shadow-ink) 10%, transparent), 0 36px 72px color-mix(in oklab, var(--shadow-ink) 13%, transparent);
+  --shadow-xs: 0 1px 2px color-mix(in oklab, var(--shadow-ink) 6%, transparent);
+  --shadow-sm: 0 1px 3px color-mix(in oklab, var(--shadow-ink) 6%, transparent), 0 3px 8px color-mix(in oklab, var(--shadow-ink) 3%, transparent);
+  --shadow-md: 0 2px 5px color-mix(in oklab, var(--shadow-ink) 6%, transparent), 0 8px 18px color-mix(in oklab, var(--shadow-ink) 5%, transparent);
+  --shadow-lg: 0 4px 8px color-mix(in oklab, var(--shadow-ink) 6%, transparent), 0 14px 30px color-mix(in oklab, var(--shadow-ink) 7%, transparent);
+  --shadow-xl: 0 6px 14px color-mix(in oklab, var(--shadow-ink) 7%, transparent), 0 24px 48px color-mix(in oklab, var(--shadow-ink) 8%, transparent);
+  --shadow-2xl: 0 12px 24px color-mix(in oklab, var(--shadow-ink) 8%, transparent), 0 36px 72px color-mix(in oklab, var(--shadow-ink) 10%, transparent);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -215,50 +215,50 @@
 /* Green-leaning neutral shadows retain depth in both color modes. */
 .shadow-premium-sm {
   box-shadow:
-    0 1px 2px color-mix(in oklab, var(--shadow-ink) 7%, transparent),
-    0 3px 8px color-mix(in oklab, var(--shadow-ink) 4%, transparent);
+    0 1px 2px color-mix(in oklab, var(--shadow-ink) 6%, transparent),
+    0 3px 8px color-mix(in oklab, var(--shadow-ink) 3%, transparent);
 }
 .shadow-premium {
   box-shadow:
-    0 2px 4px color-mix(in oklab, var(--shadow-ink) 7%, transparent),
-    0 6px 14px color-mix(in oklab, var(--shadow-ink) 6%, transparent),
-    0 14px 30px color-mix(in oklab, var(--shadow-ink) 5%, transparent);
+    0 2px 4px color-mix(in oklab, var(--shadow-ink) 5%, transparent),
+    0 6px 14px color-mix(in oklab, var(--shadow-ink) 4%, transparent),
+    0 14px 30px color-mix(in oklab, var(--shadow-ink) 4%, transparent);
 }
 .shadow-premium-lg {
   box-shadow:
-    0 4px 8px color-mix(in oklab, var(--shadow-ink) 8%, transparent),
-    0 12px 24px color-mix(in oklab, var(--shadow-ink) 7%, transparent),
-    0 28px 56px color-mix(in oklab, var(--shadow-ink) 6%, transparent);
+    0 4px 8px color-mix(in oklab, var(--shadow-ink) 6%, transparent),
+    0 12px 24px color-mix(in oklab, var(--shadow-ink) 5%, transparent),
+    0 28px 56px color-mix(in oklab, var(--shadow-ink) 4%, transparent);
 }
 .shadow-premium-xl {
   box-shadow:
-    0 8px 16px color-mix(in oklab, var(--shadow-ink) 9%, transparent),
-    0 20px 40px color-mix(in oklab, var(--shadow-ink) 8%, transparent),
-    0 48px 96px color-mix(in oklab, var(--shadow-ink) 6%, transparent);
+    0 8px 16px color-mix(in oklab, var(--shadow-ink) 7%, transparent),
+    0 20px 40px color-mix(in oklab, var(--shadow-ink) 6%, transparent),
+    0 48px 96px color-mix(in oklab, var(--shadow-ink) 4%, transparent);
 }
 /* Gold-tinted glow for the premium accent */
 .shadow-gold-glow {
   box-shadow:
-    0 4px 12px color-mix(in oklab, var(--accent) 25%, transparent),
-    0 8px 24px color-mix(in oklab, var(--accent) 15%, transparent);
+    0 4px 12px color-mix(in oklab, var(--accent) 18%, transparent),
+    0 8px 24px color-mix(in oklab, var(--accent) 10%, transparent);
 }
 .shadow-gold-glow-lg {
   box-shadow:
-    0 8px 24px color-mix(in oklab, var(--accent) 30%, transparent),
-    0 16px 48px color-mix(in oklab, var(--accent) 20%, transparent),
-    0 32px 80px color-mix(in oklab, var(--accent) 10%, transparent);
+    0 8px 24px color-mix(in oklab, var(--accent) 22%, transparent),
+    0 16px 48px color-mix(in oklab, var(--accent) 14%, transparent),
+    0 32px 80px color-mix(in oklab, var(--accent) 7%, transparent);
 }
 /* Forest-green glow for primary CTAs */
 .shadow-emerald-glow {
   box-shadow:
-    0 4px 12px color-mix(in oklab, var(--primary) 25%, transparent),
-    0 8px 24px color-mix(in oklab, var(--primary) 15%, transparent);
+    0 4px 12px color-mix(in oklab, var(--primary) 18%, transparent),
+    0 8px 24px color-mix(in oklab, var(--primary) 10%, transparent);
 }
 .shadow-emerald-glow-lg {
   box-shadow:
-    0 8px 24px color-mix(in oklab, var(--primary) 30%, transparent),
-    0 16px 48px color-mix(in oklab, var(--primary) 20%, transparent),
-    0 32px 80px color-mix(in oklab, var(--primary) 10%, transparent);
+    0 8px 24px color-mix(in oklab, var(--primary) 22%, transparent),
+    0 16px 48px color-mix(in oklab, var(--primary) 14%, transparent),
+    0 32px 80px color-mix(in oklab, var(--primary) 7%, transparent);
 }
 
 /* ─── Glass-morphism ─── */
